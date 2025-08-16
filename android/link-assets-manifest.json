@@ -1,0 +1,37 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Poppins-Bold.ttf",
+      "sha1": "875cf0cecd647bcf22e79d633d868c1b1ec98dfa"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Medium.ttf",
+      "sha1": "283f21b44efbdbf276ba802be2d949a36bbc4233"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Regular.ttf",
+      "sha1": "fdd3002e7d814ee47c1c1b8487c72c6bbb3a2d00"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-SemiBold.ttf",
+      "sha1": "8a4ace9392d06bcb7f8ea2f5169b07e4c383a90d"
+    },
+    {
+      "path": "src/assets/fonts/Unbounded-Bold.ttf",
+      "sha1": "fc20bf316963025d4bd89e513fff20b27c18d8ad"
+    },
+    {
+      "path": "src/assets/fonts/Unbounded-Medium.ttf",
+      "sha1": "6eee2b132b3e2a68294e506ed181fdcd37fec108"
+    },
+    {
+      "path": "src/assets/fonts/Unbounded-Regular.ttf",
+      "sha1": "6149891af7e7dbd207323315fcd25a08bd364a8c"
+    },
+    {
+      "path": "src/assets/fonts/Unbounded-SemiBold.ttf",
+      "sha1": "c3adb4281bb42ed8aab996e8a4224538a447828e"
+    }
+  ]
+}

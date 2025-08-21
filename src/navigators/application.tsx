@@ -1,51 +1,52 @@
 import {
   createStackNavigator,
   TransitionPresets,
-} from '@react-navigation/stack';
-import React, { Fragment, JSX } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider } from '@shopify/restyle';
-import Toast from 'react-native-toast-message';
-import { StatusBar, StyleSheet } from 'react-native';
-import { theme } from '@/components/theme';
-import { toastConfig } from '@/components/toast';
-import { AppRoutes } from './navigation';
-import Login from '@/screens/login';
-import Signup from '@/screens/signup';
-import Gender from '@/screens/gender';
-import Age from '@/screens/age';
-import Weight from '@/screens/weight';
-import Height from '@/screens/height';
-import Sport from '@/screens/sport';
-import About from '@/screens/about';
-import Success from '@/screens/success';
-import VerifyIdentity from '@/screens/verify_identity';
-import MainTab from './mainTab';
-import Notification from '@/screens/notification';
-import Subscription from '@/screens/subscription';
-import Menu from '@/screens/menu';
-import DeliveryTime from '@/screens/delivery_time';
-import Payment from '@/screens/payment';
-import Dish from '@/screens/dish';
-import Exercise from '@/screens/exercise';
-import Info from '@/screens/personalized_info';
-import Info2 from '@/screens/personalized_info2';
-import Info3 from '@/screens/personalized_info3';
-import { useAppSelector } from '@/store';
-import Exercises from '@/screens/exercises';
-import Location from '@/screens/location';
-import Workout from '@/screens/workout';
-import Leaderboard from '@/screens/leaderboard';
-import VerificationOtp from '@/screens/verfication_otp';
-import Onboard from '@/screens/onboarding';
-import SuccessHome from '@/screens/success_home';
-import ResetPassword from '@/screens/reset_password';
-import TermsnPolicy from '@/screens/other_info';
-import Faq from '@/screens/faq';
-import Order from '@/screens/orders';
-import OrderDetail from '@/screens/order_detail';
-import Chat from '@/screens/chat';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "@react-navigation/stack";
+import React, { Fragment, JSX } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { ThemeProvider } from "@shopify/restyle";
+import Toast from "react-native-toast-message";
+import { StatusBar, StyleSheet } from "react-native";
+import { theme } from "@/components/theme";
+import { toastConfig } from "@/components/toast";
+import { AppRoutes } from "./navigation";
+import Login from "@/screens/login";
+import Signup from "@/screens/signup";
+import Gender from "@/screens/gender";
+import Age from "@/screens/age";
+import Weight from "@/screens/weight";
+import Height from "@/screens/height";
+import Sport from "@/screens/sport";
+import About from "@/screens/about";
+import Success from "@/screens/success";
+import VerifyIdentity from "@/screens/verify_identity";
+import MainTab from "./mainTab";
+import Notification from "@/screens/notification";
+import Subscription from "@/screens/subscription";
+import Menu from "@/screens/menu";
+import DeliveryTime from "@/screens/delivery_time";
+import Payment from "@/screens/payment";
+import Dish from "@/screens/dish";
+import Exercise from "@/screens/exercise";
+import Info from "@/screens/personalized_info";
+import Info2 from "@/screens/personalized_info2";
+import Info3 from "@/screens/personalized_info3";
+import { useAppSelector } from "@/store";
+import Exercises from "@/screens/exercises";
+import Location from "@/screens/location";
+import Workout from "@/screens/workout";
+import Leaderboard from "@/screens/leaderboard";
+import VerificationOtp from "@/screens/verfication_otp";
+import Onboard from "@/screens/onboarding";
+import SuccessHome from "@/screens/success_home";
+import ResetPassword from "@/screens/reset_password";
+import TermsnPolicy from "@/screens/other_info";
+import Faq from "@/screens/faq";
+import Order from "@/screens/orders";
+import OrderDetail from "@/screens/order_detail";
+import Chat from "@/screens/chat";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Checkout from "@/screens/checkout";
 
 const Stack = createStackNavigator<AppRoutes>();
 const LoginScreens = [
@@ -85,13 +86,14 @@ const Screens = [
   { Order },
   { OrderDetail },
   { Chat },
+  { Checkout },
 ];
 
 type TScreens = keyof (typeof Screens)[0];
 type LoginScreen = keyof (typeof LoginScreens)[0];
 
 const ApplicationNavigator = () => {
-  const { access_token } = useAppSelector(state => state.local);
+  const { access_token } = useAppSelector((state) => state.local);
   return (
     <NavigationContainer>
       <ThemeProvider {...{ theme }}>
@@ -103,22 +105,22 @@ const ApplicationNavigator = () => {
           }}
         >
           {!!access_token
-            ? Screens.map(item => {
+            ? Screens.map((item) => {
                 const [name, Component] = Object.entries(item)[0] as [
                   TScreens,
-                  () => JSX.Element, // TypeScript type for components
+                  () => JSX.Element // TypeScript type for components
                 ];
 
                 // Define ScreenComponent to handle conditional SafeAreaView wrapping
                 const ScreenComponent = (props: any) => {
-                  return name === 'Dish' || name === 'Exercise' ? (
+                  return name === "Dish" || name === "Exercise" ? (
                     <Component {...props} />
                   ) : (
                     <SafeAreaView
                       style={styles.container}
-                      edges={['top', 'bottom']}
+                      edges={["top", "bottom"]}
                     >
-                      <StatusBar animated={true} barStyle={'dark-content'} />
+                      <StatusBar animated={true} barStyle={"dark-content"} />
                       <Component {...props} />
                     </SafeAreaView>
                   );
@@ -130,27 +132,27 @@ const ApplicationNavigator = () => {
                     name={name}
                     component={ScreenComponent}
                     options={{
-                      gestureEnabled: name != 'SuccessHome', // Disable gestures for 'Exercise' screen
+                      gestureEnabled: name != "SuccessHome", // Disable gestures for 'Exercise' screen
                     }}
                   />
                 );
               })
-            : LoginScreens.map(item => {
+            : LoginScreens.map((item) => {
                 const [name, Component] = Object.entries(item)[0] as [
                   LoginScreen,
-                  () => JSX.Element, // TypeScript type for components
+                  () => JSX.Element // TypeScript type for components
                 ];
 
                 // Define ScreenComponent to handle conditional SafeAreaView wrapping
                 const ScreenComponent = (props: any) => {
-                  return name === 'Onboard' ? (
+                  return name === "Onboard" ? (
                     <Component {...props} />
                   ) : (
                     <SafeAreaView
                       style={styles.container}
-                      edges={['top', 'bottom']}
+                      edges={["top", "bottom"]}
                     >
-                      <StatusBar animated={true} barStyle={'dark-content'} />
+                      <StatusBar animated={true} barStyle={"dark-content"} />
                       <Component {...props} />
                     </SafeAreaView>
                   );

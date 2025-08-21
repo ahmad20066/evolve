@@ -1,21 +1,24 @@
-import {MutationOptions, useMutation} from '@tanstack/react-query';
-import {axios, IApiError} from './axios.config';
-import {useAppSelector} from '@/store';
+import { MutationOptions, useMutation } from "@tanstack/react-query";
+import { axios, IApiError } from "./axios.config";
+import { useAppSelector } from "@/store";
 
 export interface ISubscribeExerciseArgs {
   package_id: number | undefined;
   pricing_id: number | undefined;
+  coupon_code: string | undefined;
 }
 
 export type ISubscribeExerciseResult = {
   message: string;
+  payment_url: string;
+  success: boolean;
 };
 
 async function SubscribeExercise(
   args: ISubscribeExerciseArgs,
-  access_token?: string,
+  access_token?: string
 ) {
-  const endpoint = `/fitness/subscribe`;
+  const endpoint = `/payments/subscribe-package`;
   const res = await axios.post<ISubscribeExerciseResult>(endpoint, args, {
     headers: {
       Authorization: `Bearer ${access_token}`,
@@ -29,9 +32,9 @@ export const useSubscribeExercise = (
     ISubscribeExerciseResult,
     IApiError,
     ISubscribeExerciseArgs
-  >,
+  >
 ) => {
-  const {access_token} = useAppSelector(state => state.local);
+  const { access_token } = useAppSelector((state) => state.local);
   return useMutation<
     ISubscribeExerciseResult,
     IApiError,

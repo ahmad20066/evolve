@@ -1,20 +1,20 @@
-import React, {ReactNode} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Home from '@/screens/home';
-import Meals from '@/screens/meals';
-import Profile from '@/screens/profile';
-import Homeicon from '@/assets/svg/home.svg';
-import Mealsicon from '@/assets/svg/burger.svg';
-import Workouticon from '@/assets/svg/dumbbell.svg';
-import Profileicon from '@/assets/svg/profile.svg';
-import {Text, theme} from '@/components/theme';
-import {AppRoutes} from './navigation';
-import WorkoutPlan from '@/screens/workout_plan';
-import Workout from '@/screens/workout';
-import {useCheckSubs} from '@/hooks/useCheckSubsrciption';
-import MyMeals from '@/screens/my_meals';
-import {useTranslation} from 'react-i18next';
+import React, { ReactNode } from "react";
+import { View, StyleSheet } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Home from "@/screens/home";
+import Meals from "@/screens/meals";
+import Profile from "@/screens/profile";
+import Homeicon from "@/assets/svg/home.svg";
+import Mealsicon from "@/assets/svg/burger.svg";
+import Workouticon from "@/assets/svg/dumbbell.svg";
+import Profileicon from "@/assets/svg/profile.svg";
+import { Text, theme } from "@/components/theme";
+import { AppRoutes } from "./navigation";
+import WorkoutPlan from "@/screens/workout_plan";
+import Workout from "@/screens/workout";
+import { useCheckSubs } from "@/hooks/useCheckSubsrciption";
+import MyMeals from "@/screens/my_meals";
+import { useTranslation } from "react-i18next";
 
 const Tab = createBottomTabNavigator<AppRoutes>();
 
@@ -41,7 +41,8 @@ const CustomTabBarIcon = ({
       <Text
         fontSize={10}
         variant="poppins12black_regular"
-        color={focused ? 'apptheme' : 'mediumGray'}>
+        color={focused ? "apptheme" : "mediumGray"}
+      >
         {label}
       </Text>
     </View>
@@ -49,43 +50,43 @@ const CustomTabBarIcon = ({
 };
 
 const MainTab = () => {
-  const {data} = useCheckSubs();
-  const {t} = useTranslation();
+  const { data } = useCheckSubs();
+  const { t } = useTranslation();
 
   return (
     <Tab.Navigator
-      screenOptions={({route}) => ({
+      screenOptions={({ route }) => ({
         tabBarShowLabel: false,
         tabBarStyle: styles.tabBar,
         headerShown: false,
-        tabBarIcon: ({focused}) => {
+        tabBarIcon: ({ focused }) => {
           let IconComponent;
-          let label = '';
+          let label = "";
 
           switch (route.name) {
-            case 'Home':
+            case "Home":
               IconComponent = <Homeicon />;
-              label = t('home');
+              label = t("home");
               break;
-            case 'Meals':
+            case "Meals":
               IconComponent = <Mealsicon />;
-              label = t('meals');
+              label = t("meals");
               break;
-            case 'MyMeals':
+            case "MyMeals":
               IconComponent = <Mealsicon />;
-              label = t('meals');
+              label = t("meals");
               break;
-            case 'WorkoutPlan':
+            case "WorkoutPlan":
               IconComponent = <Workouticon />;
-              label = t('work');
+              label = t("work");
               break;
-            case 'Workout':
+            case "Workout":
               IconComponent = <Workouticon />;
-              label = t('work');
+              label = t("work");
               break;
-            case 'Profile':
+            case "Profile":
               IconComponent = <Profileicon />;
-              label = t('profile');
+              label = t("profile");
               break;
           }
 
@@ -97,7 +98,8 @@ const MainTab = () => {
             />
           );
         },
-      })}>
+      })}
+    >
       <Tab.Screen name="Home" component={Home} />
       {data?.dietSubscription ? (
         <Tab.Screen name="MyMeals" component={MyMeals} />
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   tabContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   semicircleBackground: {
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24, // Half the width for a perfect semicircle
     borderTopRightRadius: 24,
     backgroundColor: theme.colors.white, // Light green with transparency
-    position: 'absolute',
+    position: "absolute",
     top: -15, // Adjust the vertical positioning
     zIndex: -1, // Place behind the icon
   },
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: theme.colors.lightGreen,
-    position: 'absolute',
+    position: "absolute",
     top: -5,
   },
   tabLabel: {
@@ -148,8 +150,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   iconWrapper: {
-    justifyContent: 'center', // Centers the icon and background vertically
-    alignItems: 'center',
+    justifyContent: "center", // Centers the icon and background vertically
+    alignItems: "center",
     height: 40, // Ensure enough height for alignment adjustments
   },
 });

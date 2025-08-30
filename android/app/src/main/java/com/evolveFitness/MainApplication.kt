@@ -1,4 +1,4 @@
-package com.evolve
+package com.evolveFitness
 
 import android.app.Application
 import com.facebook.react.PackageList

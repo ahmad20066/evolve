@@ -1,4 +1,4 @@
-package com.evolve
+package com.evolveFitness
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

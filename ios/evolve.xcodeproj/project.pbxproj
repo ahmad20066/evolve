@@ -11,6 +11,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		164C1D4CE11745E396E21172 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C7D878F864BA4837A07D2AE8 /* Poppins-Bold.ttf */; };
 		381A01112E4FE623004CDA1C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 381A01102E4FE623004CDA1C /* GoogleService-Info.plist */; };
+		383C248A2E5892BB000D6E69 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 383C24892E5892BB000D6E69 /* StoreKit.framework */; };
 		3D6F52A0AAB147F8BEFC906F /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F7517265E6144ED817413E8 /* Poppins-Medium.ttf */; };
 		4F421EC789B04E1A9121EE37 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2B725FD9F36439BB336F817 /* Poppins-Regular.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
@@ -30,6 +31,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = evolve/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = evolve/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		381A01102E4FE623004CDA1C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		383C24892E5892BB000D6E69 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3B4392A12AC88292D35C810B /* Pods-evolve.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-evolve.debug.xcconfig"; path = "Target Support Files/Pods-evolve/Pods-evolve.debug.xcconfig"; sourceTree = "<group>"; };
 		54FC6D05644F4CCD83AB4DC8 /* Unbounded-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Unbounded-SemiBold.ttf"; path = "../src/assets/fonts/Unbounded-SemiBold.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-evolve.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-evolve.release.xcconfig"; path = "Target Support Files/Pods-evolve/Pods-evolve.release.xcconfig"; sourceTree = "<group>"; };
@@ -51,6 +53,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-evolve.a in Frameworks */,
+				383C248A2E5892BB000D6E69 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,6 +76,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				383C24892E5892BB000D6E69 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-evolve.a */,
 			);

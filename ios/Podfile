@@ -35,6 +35,7 @@ target 'evolve' do
   pod 'FirebaseCoreInternal',   :modular_headers => true
   pod 'GoogleUtilities',        :modular_headers => true
   pod 'FirebaseCore',           :modular_headers => true
+  pod 'RNIap', :path => '../node_modules/react-native-iap'
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.

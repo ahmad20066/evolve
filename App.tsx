@@ -1,20 +1,17 @@
-import React from 'react';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { LogBox } from 'react-native';
-import { persistor, store } from '@/store';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FCMPushNotificationsProvider } from '@/providers/FCMPushNotification';
-import i18n from 'i18next';
-import { I18nextProvider } from 'react-i18next';
-import '@/i18n';
-import ApplicationNavigator from '@/navigators/application';
+import React from "react";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { LogBox, Platform } from "react-native";
+import { persistor, store } from "@/store";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { FCMPushNotificationsProvider } from "@/providers/FCMPushNotification";
+import i18n from "i18next";
+import { I18nextProvider } from "react-i18next";
+import "./src/i18n";
+import ApplicationNavigator from "@/navigators/application";
+import { withIAPContext } from "react-native-iap";
 
-LogBox.ignoreLogs([
-  'Warning: ...',
-  'ViewPropTypes will be removed',
-  'ColorPropType will be removed',
-]); // Ignore log notification by message
+LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 
 function App() {
@@ -33,4 +30,4 @@ function App() {
     </Provider>
   );
 }
-export default App;
+export default Platform.OS == "ios" ? withIAPContext(App) : App;

@@ -1,6 +1,6 @@
 import { globalStyles } from "@/styles/globalStyles";
-import React, { useCallback, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import AddNewCardModal from "./components/addNewCardModal";
 import Back from "@/assets/svg/arrow-left.svg";
 import RoundButton from "@/components/roundButton";
@@ -18,18 +18,23 @@ import TextInput from "@/components/textinput";
 import { useMealCoupon } from "@/hooks/useMealCoupon";
 import { useFitnessCoupon } from "@/hooks/useFitnessCoupon";
 import { calculateMonths } from "@/utils/month";
-// import {
-//   PurchaseError,
-//   requestSubscription,
-//   useIAP,
-//   validateReceiptIos,
-// } from 'react-native-iap';
+import {
+  initConnection,
+  PurchaseError,
+  requestSubscription,
+  validateReceiptIos,
+} from "react-native-iap";
+import * as IAP from "react-native-iap";
+import { CommonActions } from "@react-navigation/native";
 
 const list = [
   { key: 1, sport: "PayPal", icon: <Paypal /> },
   { key: 2, sport: "Google Pay", icon: <Gpay /> },
   { key: 3, sport: "Apple Pay", icon: <Apple /> },
 ];
+
+let purchaseUpdatedListener;
+let purchaseErrorListener;
 
 const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
   const { t } = useTranslation();
@@ -40,7 +45,9 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
     package_id,
     pricing_id,
     pay_details,
+    productId,
   } = route.params;
+
   const [visible, setvisible] = useState(false);
   const [active, setactive] = useState(1);
   const [coupon, setcoupon] = useState("");
@@ -62,7 +69,16 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
   const { mutate: subExercise, isPending: subPending } = useSubscribeExercise({
     onSuccess(data) {
       showToast("successToast", data.message, "top");
-      navigation.navigate("Checkout", { url: data.payment_url });
+      if (Platform.OS === "ios") {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "MainTab" }],
+          })
+        );
+      } else if (Platform.OS === "android") {
+        navigation.navigate("Checkout", { url: data.payment_url });
+      }
     },
     onError(err: any) {
       showToast("errorToast", err.errors[0].message, "top");
@@ -91,7 +107,11 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
 
   const handleCouponClicked = useCallback(() => {
     if (package_id != null && pricing_id != null) {
-      fitnessCoupon({ package_id, pricing_id, coupon_code: coupon });
+      fitnessCoupon({
+        package_id: Number(package_id),
+        pricing_id,
+        coupon_code: coupon,
+      });
     } else {
       mealCoupon({
         meal_plan_id: delivery_id,
@@ -101,8 +121,8 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
   }, [coupon, package_id, pricing_id, delivery_id]);
 
   const handleConfirmClicked = React.useCallback(() => {
-    if (package_id != null && package_id != null)
-      subExercise({ package_id, pricing_id, coupon_code: coupon });
+    if (package_id != null && pricing_id != null)
+      subExercise({ package_id: package_id, pricing_id, coupon_code: coupon });
     else
       mutate({
         meal_plan_id: meal_plan_id,
@@ -117,121 +137,133 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
         coupon_code: coupon,
       });
   }, [delivery_id, meal_plan_id, address, package_id, pricing_id, coupon]);
-  // const errorLog = ({message, error}) => {
-  //   console.error('An error happened', message, error);
-  // };
 
-  // const isIos = Platform.OS === 'ios';
+  //product id from appstoreconnect app->subscriptions
+  const subscriptionSkus = useMemo(
+    () =>
+      Platform.select({
+        ios: [
+          "evolveFitness123",
+          "evolveFitnessPro",
+          "evolve_one",
+          "evolve_guided",
+          "evolve_kick",
+        ],
+        android: [""],
+      }) ?? [],
+    []
+  );
+  const [purchase, setpurchase] = useState(false);
+  const [checking, setchecking] = useState(false);
+  interface ReceiptBody {
+    "receipt-data": string;
+    password: string;
+  }
 
-  // //product id from appstoreconnect app->subscriptions
-  // const subscriptionSkus = Platform.select({
-  //   ios: ['evolveFitness123', 'evolveFitnessPro'],
-  // });
+  interface LatestReceiptInfo {
+    expires_date_ms: string;
+    // Add other fields as needed
+  }
 
-  // //useIAP - easy way to access react-native-iap methods to
-  // //get your products, purchases, subscriptions, callback
-  // //and error handlers.
-  // const {
-  //   connected,
-  //   subscriptions, //returns subscriptions for this app.
-  //   getSubscriptions, //Gets available subsctiptions for this app.
-  //   currentPurchase, //current purchase for the tranasction
-  //   finishTransaction,
-  //   purchaseHistory, //return the purchase history of the user on the device (sandbox user in dev)
-  //   getPurchaseHistory, //gets users purchase history
-  // } = useIAP();
+  interface ReceiptResponse {
+    latest_receipt_info: LatestReceiptInfo[];
+    // Add other fields as needed
+  }
 
-  // const [loading, setLoading] = useState(false);
+  const validate = async (receipt: string): Promise<void> => {
+    setchecking(true);
+    const receiptbody: ReceiptBody = {
+      "receipt-data": receipt,
+      password: "4503989042d143bc9a09f520893244ab",
+    };
+    const result = await validateReceiptIos({ receiptBody: receiptbody })
+      .catch(() => {
+        console.error("Receipt validation failed");
+      })
+      .then((receipt: ReceiptResponse | undefined) => {
+        try {
+          if (receipt && receipt.latest_receipt_info) {
+            const renewalHistory = receipt.latest_receipt_info;
+            const expiration =
+              renewalHistory[renewalHistory.length - 1].expires_date_ms;
+            let expired = Date.now() > Number(expiration);
+            if (!expired) {
+              setpurchase(true);
+              if (package_id != null && package_id != null)
+                subExercise({
+                  package_id: Number(package_id),
+                  pricing_id,
+                  coupon_code: coupon,
+                });
+            } else {
+              showToast("errorToast", "Subscription has expired", "top");
+              console.error("Subscription has expired");
+            }
+            setchecking(false);
+          }
+        } catch (error) {
+          console.error("Error processing receipt:", error);
+        }
+      });
+  };
+  useEffect(() => {
+    if (Platform.OS === "ios") {
+      const initIAP = async () => {
+        try {
+          await initConnection();
+          await IAP.getSubscriptions({ skus: subscriptionSkus });
+          IAP.getPurchaseHistory()
+            .catch((err) => {
+              console.error("IAP Error:", err);
+            })
+            .then((res) => {
+              console.log("Purchase History:", res);
+              if (Array.isArray(res) && res.length > 0) {
+                const receipt = res[res.length - 1]?.transactionReceipt;
+                if (receipt) {
+                  // Validate receipt here and unlock content
+                  validate(receipt);
+                  console.log("Valid Receipt:", receipt);
+                }
+              }
+            });
+        } catch (error) {
+          console.error("IAP Error:", error);
+        }
+      };
+      initIAP();
+      return () => {
+        IAP.endConnection();
+      };
+    }
+    // purchaseUpdatedListener = IAP.purchaseUpdatedListener((purchase) => {
+    //   try {
+    //     const receipt = purchase.transactionReceipt;
+    //     console.log("Purchase Updated:", purchase, receipt);
+    //   } catch (error) {
+    //     console.error("Purchase Update Error:", error);
+    //   }
+    // });
+  }, []);
 
-  // const handleGetPurchaseHistory = async () => {
-  //   try {
-  //     await getPurchaseHistory();
-  //   } catch (error) {
-  //     errorLog({message: 'handleGetPurchaseHistory', error});
-  //   }
-  // };
+  const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   handleGetPurchaseHistory();
-  // }, [connected]);
-
-  // const handleGetSubscriptions = async () => {
-  //   try {
-  //     await getSubscriptions({skus: subscriptionSkus});
-  //   } catch (error) {
-  //     errorLog({message: 'handleGetSubscriptions', error});
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   handleGetSubscriptions();
-  // }, [connected]);
-
-  // useEffect(() => {
-  //   // ... listen if connected, purchaseHistory and subscriptions exist
-  //   if (
-  //     purchaseHistory.find(
-  //       x => x.productId === (subscriptionSkus[0] || subscriptionSkus[1]),
-  //     )
-  //   ) {
-  //     navigation.navigate('Home');
-  //   }
-  // }, [connected, purchaseHistory, subscriptions]);
-
-  // const handleBuySubscription = async productId => {
-  //   try {
-  //     await requestSubscription({
-  //       sku: productId,
-  //     });
-  //     setLoading(false);
-  //   } catch (error) {
-  //     setLoading(false);
-  //     if (error instanceof PurchaseError) {
-  //       errorLog({message: `[${error.code}]: ${error.message}`, error});
-  //     } else {
-  //       errorLog({message: 'handleBuySubscription', error});
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const checkCurrentPurchase = async purchase => {
-  //     if (purchase) {
-  //       try {
-  //         const receipt = purchase.transactionReceipt;
-  //         if (receipt) {
-  //           if (Platform.OS === 'ios') {
-  //             const isTestEnvironment = __DEV__;
-
-  //             //send receipt body to apple server to validete
-  //             const appleReceiptResponse = await validateReceiptIos(
-  //               {
-  //                 'receipt-data': receipt,
-  //                 password: '4503989042d143bc9a09f520893244ab',
-  //               },
-  //               isTestEnvironment,
-  //             );
-
-  //             //if receipt is valid
-  //             if (appleReceiptResponse) {
-  //               const {status} = appleReceiptResponse;
-  //               if (status) {
-  //                 navigation.navigate('Home');
-  //               }
-  //             }
-
-  //             return;
-  //           }
-  //         }
-  //       } catch (error) {
-  //         console.log('error', error);
-  //       }
-  //     }
-  //   };
-  //   checkCurrentPurchase(currentPurchase);
-  // }, [currentPurchase, finishTransaction]);
-
-  // console.log({subscriptions});
+  const handleBuySubscription = async (productId: string) => {
+    try {
+      setLoading(true);
+      await requestSubscription({
+        sku: productId,
+      });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      if (error instanceof PurchaseError) {
+        console.log("PurchaseError:", error);
+      } else {
+        console.log("handleBuySubscription error:", error);
+      }
+    }
+  };
 
   return (
     <View style={globalStyles.container}>
@@ -351,15 +383,31 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
       </ScrollView>
       <View style={[globalStyles.shadow, styles.padd]}>
         <BaseButton
-          isLoading={isPending || subPending}
-          disabled={isPending || subPending}
+          isLoading={isPending || subPending || loading}
+          disabled={isPending || subPending || loading}
           label={t("confirm_payment")}
-          onPress={handleConfirmClicked}
-
-          // onPress={() => {
-          //   setLoading(true);
-          //   // handleBuySubscription(subscription.productId);
-          // }}
+          onPress={() => {
+            if (Platform.OS == "ios") {
+              if (package_id == null && pricing_id == null) {
+                mutate({
+                  meal_plan_id: meal_plan_id,
+                  delivery_time_id: delivery_id,
+                  street: address?.street,
+                  city: address?.city,
+                  address_label: address?.address_label,
+                  building: address?.building,
+                  postal_code: address?.postal_code,
+                  delivery_notes: address?.delivery_notes,
+                  state: address?.state,
+                  coupon_code: coupon,
+                });
+              } else {
+                handleBuySubscription(productId!);
+              }
+            } else if (Platform.OS === "android") {
+              handleConfirmClicked();
+            }
+          }}
         />
       </View>
       <AddNewCardModal

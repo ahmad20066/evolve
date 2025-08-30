@@ -1,10 +1,10 @@
-import {axios, IApiError} from '@/hooks/axios.config';
-import {useAppSelector} from '@/store';
-import {IPricing} from '@/types/pricing';
-import {useQuery, UseQueryOptions} from '@tanstack/react-query';
+import { axios, IApiError } from "@/hooks/axios.config";
+import { useAppSelector } from "@/store";
+import { IPricing } from "@/types/pricing";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 export type IWorkoutPlans = {
-  id: number;
+  id: number | string;
   name: string;
   description: string;
   name_ar: string;
@@ -28,12 +28,12 @@ async function getWorkoutPlans(token?: string) {
 export const useWorkoutPlans = (
   config?: Omit<
     UseQueryOptions<IWorkoutPlans[], IApiError>,
-    'queryKey' | 'queryFn'
-  >,
+    "queryKey" | "queryFn"
+  >
 ) => {
-  const {access_token} = useAppSelector(state => state.local);
+  const { access_token } = useAppSelector((state) => state.local);
   return useQuery({
-    queryKey: ['Workout-Plans'],
+    queryKey: ["Workout-Plans"],
     queryFn: () => getWorkoutPlans(access_token),
     retry: 2,
     ...config,

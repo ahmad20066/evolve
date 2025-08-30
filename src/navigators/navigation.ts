@@ -82,6 +82,7 @@ export type AppRoutes = {
       delivery_notes?: string;
       state: string;
     };
+    productId?: string;
   };
   Dish: { id: number };
   Exercise: { id: number; workout_id?: number };

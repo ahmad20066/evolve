@@ -1,18 +1,18 @@
-const presets = ['@react-native/babel-preset'];
+const presets = ["@react-native/babel-preset"];
 const plugins = [];
 
 plugins.push(
   [
-    'module-resolver',
+    "module-resolver",
     {
-      root: ['./src'],
-      extensions: ['.js', '.json'],
+      root: ["./src"],
+      extensions: [".js", ".json"],
       alias: {
-        '@': './src',
+        "@": "./src",
       },
     },
   ],
-  ['react-native-reanimated/plugin'],
+  "react-native-worklets/plugin"
 );
 
 module.exports = {
@@ -21,7 +21,7 @@ module.exports = {
     {
       plugins: [
         [
-          '@babel/plugin-transform-private-methods',
+          "@babel/plugin-transform-private-methods",
           {
             loose: true,
           },

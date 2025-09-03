@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { FCMPushNotificationsProvider } from "@/providers/FCMPushNotification";
 import i18n from "i18next";
 import { I18nextProvider } from "react-i18next";
-import "./src/i18n";
+import "@/i18n";
 import ApplicationNavigator from "@/navigators/application";
 import { withIAPContext } from "react-native-iap";
 

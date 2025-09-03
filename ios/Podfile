@@ -10,6 +10,7 @@ node_require('react-native/scripts/react_native_pods.rb')
 node_require('react-native-permissions/scripts/setup.rb')
 
 platform :ios, min_ios_version_supported
+use_modular_headers!
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -25,32 +26,32 @@ setup_permissions([
   # 'LocationAccuracy', # optional
 ])
 
+# ✅ Pin Firebase SDK version to match RNFBMessaging
+$FirebaseSDKVersion = '12.2.0'
+
 target 'evolve' do
   config = use_native_modules!
   flags = get_default_flags()
 
-  # ✅ Firebase pods
-  pod 'Firebase/Messaging'
-  pod 'Firebase',               :modular_headers => true
-  pod 'FirebaseCoreInternal',   :modular_headers => true
-  pod 'GoogleUtilities',        :modular_headers => true
-  pod 'FirebaseCore',           :modular_headers => true
+  # Firebase (messaging only, version pinned)
+  pod 'Firebase/Messaging', $FirebaseSDKVersion
+
+  # In-app purchase
   pod 'RNIap', :path => '../node_modules/react-native-iap'
+
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   post_install do |installer|
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
-        installer.pods_project.targets.each do |target|
+
+    installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
         config.build_settings['OTHER_LDFLAGS'] ||= []
@@ -59,7 +60,8 @@ target 'evolve' do
         config.build_settings['ENABLE_BITCODE'] = 'NO'
       end
     end
-     installer.pods_project.build_configurations.each do |config|
+
+    installer.pods_project.build_configurations.each do |config|
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
     end
   end

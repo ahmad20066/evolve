@@ -6,6 +6,8 @@ export interface ISubscribeExerciseArgs {
   package_id: number | undefined;
   pricing_id: number | undefined;
   coupon_code: string | undefined;
+  apple_receipt?: string | undefined;
+  payment_method: "tap" | "iap";
 }
 
 export type ISubscribeExerciseResult = {

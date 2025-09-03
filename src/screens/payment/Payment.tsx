@@ -122,7 +122,12 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
 
   const handleConfirmClicked = React.useCallback(() => {
     if (package_id != null && pricing_id != null)
-      subExercise({ package_id: package_id, pricing_id, coupon_code: coupon });
+      subExercise({
+        package_id: package_id,
+        pricing_id,
+        coupon_code: coupon,
+        payment_method: "tap",
+      });
     else
       mutate({
         meal_plan_id: meal_plan_id,
@@ -194,6 +199,8 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
                   package_id: Number(package_id),
                   pricing_id,
                   coupon_code: coupon,
+                  apple_receipt: receiptbody["receipt-data"],
+                  payment_method: "iap",
                 });
             } else {
               showToast("errorToast", "Subscription has expired", "top");

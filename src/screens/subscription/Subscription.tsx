@@ -17,7 +17,6 @@ import { useTranslation } from "react-i18next";
 import { useRenewWorkout } from "@/hooks/useRenewWorkout";
 import { useRenewMeal } from "@/hooks/useRenewMeal";
 import * as RNIap from "react-native-iap";
-
 const Subscription = ({ navigation }: AppNavigationProps<"Subscription">) => {
   const { t, i18n } = useTranslation();
   const { data } = useCurrentSubs();
@@ -29,7 +28,6 @@ const Subscription = ({ navigation }: AppNavigationProps<"Subscription">) => {
       showToast("errorToast", err.errors[0].message, "top");
     },
   });
-
   const { mutate: renewMeal, isPending: mealPending } = useRenewMeal({
     onSuccess(data) {
       showToast("successToast", data.message, "top");
@@ -38,21 +36,47 @@ const Subscription = ({ navigation }: AppNavigationProps<"Subscription">) => {
       showToast("errorToast", err.errors[0].message, "top");
     },
   });
-
-  const restorePurchases = async () => {
+  const handleRestore = async () => {
     try {
-      const restored = await RNIap.getAvailablePurchases();
-      if (restored && restored.length > 0) {
-        showToast("successToast", "Your purchases have been restored.", "top");
+      // Fetch all available purchases (non-consumables + subscriptions)
+      const purchases = await RNIap.getAvailablePurchases();
+      if (purchases.length === 0) {
+        showToast(
+          "errorToast",
+          "No Purchases We couldn’t find any active subscriptions.",
+          "top"
+        );
+        return;
+      }
+      // If you have multiple subscription productIds, check against them
+      const subscription = purchases.find((p) =>
+        [
+          "evolveFitness123",
+          "evolveFitnessPro",
+          "evolve_one",
+          "evolve_guided",
+          "evolve_kick",
+        ].includes(p.productId)
+      );
+      if (subscription) {
+        showToast(
+          "successToast",
+          "Your subscription has been restored!",
+          "top"
+        );
+        // :point_right: update your state/redux with subscription info here
       } else {
-        showToast("errorToast", "No purchases to restore.", "top");
+        showToast(
+          "errorToast",
+          "No Active Subscription, Your past plans may have expired.",
+          "top"
+        );
       }
     } catch (err) {
-      console.warn(err);
+      console.error("Restore error", err);
       showToast("errorToast", "Failed to restore purchases.", "top");
     }
   };
-
   const { mutate, isPending } = useCancelSub({
     onSuccess(data) {
       showToast("successToast", data.message, "top");
@@ -120,9 +144,12 @@ const Subscription = ({ navigation }: AppNavigationProps<"Subscription">) => {
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         {items.length == 0 ? (
-          <Text textAlign="center" mt="xxl" variant="poppins14black_regular">
-            {t("no_sub")}
-          </Text>
+          <>
+            <Text textAlign="center" mt="xxl" variant="poppins14black_regular">
+              {t("no_sub")}
+            </Text>
+            <BaseButton label={t("restore_purchase")} onPress={handleRestore} />
+          </>
         ) : (
           items?.map((item) => (
             <View key={item.key}>
@@ -219,7 +246,6 @@ const Subscription = ({ navigation }: AppNavigationProps<"Subscription">) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: "5%",
@@ -270,5 +296,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-
 export default Subscription;

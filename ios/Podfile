@@ -10,7 +10,6 @@ node_require('react-native/scripts/react_native_pods.rb')
 node_require('react-native-permissions/scripts/setup.rb')
 
 platform :ios, min_ios_version_supported
-use_modular_headers!
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -34,6 +33,10 @@ target 'evolve' do
   flags = get_default_flags()
 
   # Firebase (messaging only, version pinned)
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true   # 👈 added
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'PromisesObjC', :modular_headers => true           # 👈 added
   pod 'Firebase/Messaging', $FirebaseSDKVersion
 
   # In-app purchase

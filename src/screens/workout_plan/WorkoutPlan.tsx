@@ -111,7 +111,6 @@ const WorkoutPlan = ({ navigation }: AppNavigationProps<"WorkoutPlan">) => {
       };
     }
   }, [data]);
-  console.log({ iosSubs });
 
   return (
     <View style={globalStyles.container}>

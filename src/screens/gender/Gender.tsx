@@ -1,23 +1,22 @@
-import RoundButton from '@/components/roundButton';
-import {AppNavigationProps} from '@/navigators/navigation';
-import {globalStyles} from '@/styles/globalStyles';
-import React, {useState} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
-import Back from '@/assets/svg/arrow-left.svg';
-import {Text, theme} from '@/components/theme';
-import RNBounceable from '@freakycoder/react-native-bounceable';
-import BaseButton from '@/components/baseBtn';
-import {showToast} from '@/components/toast';
-import {useTranslation} from 'react-i18next';
+import RoundButton from "@/components/roundButton";
+import { AppNavigationProps } from "@/navigators/navigation";
+import { globalStyles } from "@/styles/globalStyles";
+import React, { useState } from "react";
+import { Image, StyleSheet, View } from "react-native";
+import Back from "@/assets/svg/arrow-left.svg";
+import { Text, theme } from "@/components/theme";
+import RNBounceable from "@freakycoder/react-native-bounceable";
+import BaseButton from "@/components/baseBtn";
+import { showToast } from "@/components/toast";
+import { useTranslation } from "react-i18next";
 
-const Gender = ({navigation, route}: AppNavigationProps<'Gender'>) => {
-  const {t} = useTranslation();
+const Gender = ({ navigation }: AppNavigationProps<"Gender">) => {
+  const { t } = useTranslation();
   const [active, setactive] = useState<number>();
-  const {token} = route.params;
 
   const gender = [
-    {label: t('male'), key: 1, img: require('@/assets/images/male.png')},
-    {label: t('female'), key: 2, img: require('@/assets/images/female.png')},
+    { label: t("male"), key: 1, img: require("@/assets/images/male.png") },
+    { label: t("female"), key: 2, img: require("@/assets/images/female.png") },
   ];
 
   return (
@@ -33,25 +32,26 @@ const Gender = ({navigation, route}: AppNavigationProps<'Gender'>) => {
           </Text>
         </Text>
         <Text mb="s" textAlign="center" variant="unbounded20black_medium">
-          {t('tell_us')}{' '}
+          {t("tell_us")}{" "}
           <Text variant="unbounded20black_medium" color="apptheme">
-            {t('gender')}
+            {t("gender")}
           </Text>
         </Text>
         <Text textAlign="center" variant="poppins14black_regular" color="gray">
-          {t('gender_description')}
+          {t("gender_description")}
         </Text>
-        {gender.map(item => (
+        {gender.map((item) => (
           <RNBounceable
             key={item.key}
             style={[
               styles.gender,
               active === item.key && {
                 borderColor: theme.colors.apptheme,
-                backgroundColor: '#FF3D000D',
+                backgroundColor: "#FF3D000D",
               },
             ]}
-            onPress={() => setactive(item.key)}>
+            onPress={() => setactive(item.key)}
+          >
             <Image source={item.img} />
             <Text variant="poppins16black_medium" mt="m">
               {item.label}
@@ -60,14 +60,13 @@ const Gender = ({navigation, route}: AppNavigationProps<'Gender'>) => {
         ))}
       </View>
       <BaseButton
-        label={t('continue')}
+        label={t("continue")}
         onPress={() => {
           if (active === undefined) {
-            showToast('errorToast', 'Please select your gender', 'top');
+            showToast("errorToast", "Please select your gender", "top");
           } else {
-            navigation.navigate('Age', {
-              token,
-              gender: active == 1 ? 'male' : 'female',
+            navigation.navigate("Age", {
+              gender: active == 1 ? "male" : "female",
             });
           }
         }}
@@ -78,20 +77,20 @@ const Gender = ({navigation, route}: AppNavigationProps<'Gender'>) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: '5%',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+    padding: "5%",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   gender: {
     width: 157,
     height: 157,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
     borderWidth: 2,
     borderColor: theme.colors.softGray,
-    marginTop: '10%',
+    marginTop: "10%",
   },
 });
 

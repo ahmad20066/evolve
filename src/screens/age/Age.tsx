@@ -1,23 +1,21 @@
-import RoundButton from '@/components/roundButton';
-import {Text, theme} from '@/components/theme';
-import {AppNavigationProps} from '@/navigators/navigation';
-import {globalStyles} from '@/styles/globalStyles';
-import RNBounceable from '@freakycoder/react-native-bounceable';
-import React from 'react';
-import {Dimensions, StyleSheet, View} from 'react-native';
-import Back from '@/assets/svg/arrow-left.svg';
-import BaseButton from '@/components/baseBtn';
-import {WheelPicker} from 'react-native-infinite-wheel-picker';
-import {useTranslation} from 'react-i18next';
+import RoundButton from "@/components/roundButton";
+import { Text, theme } from "@/components/theme";
+import { AppNavigationProps } from "@/navigators/navigation";
+import { globalStyles } from "@/styles/globalStyles";
+import React from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
+import Back from "@/assets/svg/arrow-left.svg";
+import BaseButton from "@/components/baseBtn";
+import { WheelPicker } from "react-native-infinite-wheel-picker";
+import { useTranslation } from "react-i18next";
 
-const {height} = Dimensions.get('screen');
+const { height } = Dimensions.get("screen");
 
-const Age = ({navigation, route}: AppNavigationProps<'Age'>) => {
-  const {t} = useTranslation();
-  const initialData = Array.from({length: 70}, (_, index) => index + 1);
+const Age = ({ navigation, route }: AppNavigationProps<"Age">) => {
+  const { t } = useTranslation();
+  const initialData = Array.from({ length: 70 }, (_, index) => index + 1);
   const [selectedIndex, setSelectedIndex] = React.useState(10);
-
-  const {token, gender} = route.params;
+  const { gender } = route.params;
 
   return (
     <View style={[globalStyles.container, styles.container]}>
@@ -32,20 +30,20 @@ const Age = ({navigation, route}: AppNavigationProps<'Age'>) => {
           </Text>
         </Text>
         <Text mb="s" textAlign="center" variant="unbounded20black_medium">
-          {t('whats_your')}{' '}
+          {t("whats_your")}{" "}
           <Text variant="unbounded20black_medium" color="apptheme">
-            {t('age')}?
+            {t("age")}?
           </Text>
         </Text>
         <Text textAlign="center" variant="poppins14black_regular" color="gray">
-          {t('age_description')}
+          {t("age_description")}
         </Text>
         <WheelPicker
           initialSelectedIndex={15}
           data={initialData}
           restElements={2}
           elementHeight={80}
-          onChangeValue={value => {
+          onChangeValue={(value) => {
             setSelectedIndex(value);
           }}
           infiniteScroll={false}
@@ -58,10 +56,9 @@ const Age = ({navigation, route}: AppNavigationProps<'Age'>) => {
         ;
       </View>
       <BaseButton
-        label={t('continue')}
+        label={t("continue")}
         onPress={() =>
-          navigation.navigate('Weight', {
-            token,
+          navigation.navigate("Weight", {
             gender,
             age: (selectedIndex + 1).toString(),
           })
@@ -73,12 +70,12 @@ const Age = ({navigation, route}: AppNavigationProps<'Age'>) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: '5%',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+    padding: "5%",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   elementTextStyle: {
-    fontFamily: 'Poppins-Bold',
+    fontFamily: "Poppins-Bold",
     fontSize: 40,
     color: theme.colors.apptheme,
   },
@@ -89,10 +86,10 @@ const styles = StyleSheet.create({
     borderTopColor: theme.colors.lightGreen,
     borderBottomColor: theme.colors.lightGreen,
     width: 48,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
-  elementContainerStyle: {height: height * 0.5},
-  containerStyle: {marginVertical: '10%'},
+  elementContainerStyle: { height: height * 0.5 },
+  containerStyle: { marginVertical: "10%" },
 });
 
 export default Age;

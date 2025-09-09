@@ -16,7 +16,7 @@ export type IWorkoutPlans = {
 };
 
 async function getWorkoutPlans(token?: string) {
-  const endpoint = `/admin/packages`;
+  const endpoint = `/fitness/packages`;
   const res = await axios.get<IWorkoutPlans[]>(endpoint, {
     headers: {
       Authorization: `Bearer ${token}`,

@@ -1,20 +1,20 @@
-import {globalStyles} from '@/styles/globalStyles';
-import React, {useState} from 'react';
-import {Platform, StyleSheet, TextInput, View} from 'react-native';
-import Back from '@/assets/svg/arrow-left.svg';
-import RoundButton from '@/components/roundButton';
-import RNBounceable from '@freakycoder/react-native-bounceable';
-import {Text, theme} from '@/components/theme';
-import BaseButton from '@/components/baseBtn';
-import {AppNavigationProps} from '@/navigators/navigation';
-import {useTranslation} from 'react-i18next';
+import { globalStyles } from "@/styles/globalStyles";
+import React, { useState } from "react";
+import { Platform, StyleSheet, TextInput, View } from "react-native";
+import Back from "@/assets/svg/arrow-left.svg";
+import RoundButton from "@/components/roundButton";
+import RNBounceable from "@freakycoder/react-native-bounceable";
+import { Text, theme } from "@/components/theme";
+import BaseButton from "@/components/baseBtn";
+import { AppNavigationProps } from "@/navigators/navigation";
+import { useTranslation } from "react-i18next";
 
-const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
-  const {token, gender, age} = route.params;
-  const {t} = useTranslation();
+const Weight = ({ navigation, route }: AppNavigationProps<"Weight">) => {
+  const { gender, age } = route.params;
+  const { t } = useTranslation();
   const weight = [
-    {label: t('kg'), key: 1},
-    {label: t('lb'), key: 2},
+    { label: t("kg"), key: 1 },
+    { label: t("lb"), key: 2 },
   ];
   const [active, setactive] = useState(1);
   const [value, setValue] = useState<number>(50);
@@ -28,11 +28,11 @@ const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
   };
 
   const increaseValue = () => {
-    setValue(prevValue => prevValue + 5);
+    setValue((prevValue) => prevValue + 5);
   };
 
   const decreaseValue = () => {
-    setValue(prevValue => (prevValue > 0 ? prevValue - 5 : 0)); // Prevent negative values
+    setValue((prevValue) => (prevValue > 0 ? prevValue - 5 : 0)); // Prevent negative values
   };
   return (
     <View style={[globalStyles.container, styles.container]}>
@@ -47,16 +47,16 @@ const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
           </Text>
         </Text>
         <Text mb="s" textAlign="center" variant="unbounded20black_medium">
-          {t('whats_your')}{' '}
+          {t("whats_your")}{" "}
           <Text variant="unbounded20black_medium" color="apptheme">
-            {t('weight')}?
+            {t("weight")}?
           </Text>
         </Text>
         <Text textAlign="center" variant="poppins14black_regular" color="gray">
-          {t('weight_description')}
+          {t("weight_description")}
         </Text>
         <View style={[globalStyles.line, styles.weightype]}>
-          {weight.map(item => (
+          {weight.map((item) => (
             <RNBounceable
               key={item.key}
               onPress={() => setactive(item.key)}
@@ -68,10 +68,12 @@ const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
                       ? theme.colors.lightGreen
                       : theme.colors.screen,
                 },
-              ]}>
+              ]}
+            >
               <Text
                 variant="poppins14black_regular"
-                color={active == item.key ? 'black' : 'gray'}>
+                color={active == item.key ? "black" : "gray"}
+              >
                 {item.label}
               </Text>
             </RNBounceable>
@@ -83,7 +85,8 @@ const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
               variant="poppinsTitle20black_regular"
               lineHeight={30}
               fontSize={21}
-              color="white">
+              color="white"
+            >
               -
             </Text>
           </RNBounceable>
@@ -96,7 +99,7 @@ const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
               textAlign="center"
             />
             <Text variant="poppins12black_bold" color="apptheme">
-              {active == 1 ? t('kg') : t('lb')}
+              {active == 1 ? t("kg") : t("lb")}
             </Text>
           </View>
           <RNBounceable style={styles.smallcircles} onPress={increaseValue}>
@@ -104,16 +107,17 @@ const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
               lineHeight={30}
               fontSize={21}
               variant="poppinsTitle20black_regular"
-              color="white">
+              color="white"
+            >
               +
             </Text>
           </RNBounceable>
         </View>
       </View>
       <BaseButton
-        label={t('continue')}
+        label={t("continue")}
         onPress={() =>
-          navigation.navigate('Height', {token, age, gender, weight: value})
+          navigation.navigate("Height", { age, gender, weight: value })
         }
       />
     </View>
@@ -122,26 +126,26 @@ const Weight = ({navigation, route}: AppNavigationProps<'Weight'>) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: '5%',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+    padding: "5%",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
-  weightype: {alignSelf: 'center', marginVertical: '5%'},
+  weightype: { alignSelf: "center", marginVertical: "5%" },
   btn: {
     width: 56,
     height: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 35,
   },
   input: {
     width: 30,
     height: 35,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     fontSize: 16,
-    lineHeight: Platform.OS == 'android' ? 12 : 20,
+    lineHeight: Platform.OS == "android" ? 12 : 20,
     marginHorizontal: 10,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: "Poppins-Bold",
     paddingBottom: 0,
   },
   plusminus: {
@@ -151,16 +155,16 @@ const styles = StyleSheet.create({
     width: 220,
     backgroundColor: theme.colors.input,
     height: 55,
-    paddingHorizontal: '3%',
-    alignSelf: 'center',
-    marginTop: '15%',
+    paddingHorizontal: "3%",
+    alignSelf: "center",
+    marginTop: "15%",
   },
   smallcircles: {
     width: 37,
     height: 37,
     borderRadius: 18.5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: theme.colors.apptheme,
   },
 });

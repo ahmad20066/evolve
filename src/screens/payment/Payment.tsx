@@ -54,6 +54,8 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
   const [discount, setdiscount] = useState<number>();
   const [newPrice, setnewPrice] = useState<number>();
 
+  console.log({ pricing_id }, { package_id });
+
   const handleBackToDashboardClicked = React.useCallback(() => {
     setvisible(false);
   }, []);

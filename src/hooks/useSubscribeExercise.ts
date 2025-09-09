@@ -20,6 +20,8 @@ async function SubscribeExercise(
   args: ISubscribeExerciseArgs,
   access_token?: string
 ) {
+  console.log({ args });
+
   const endpoint = `/payments/subscribe-package`;
   const res = await axios.post<ISubscribeExerciseResult>(endpoint, args, {
     headers: {

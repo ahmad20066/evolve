@@ -10,24 +10,21 @@ export type AppRoutes = {
   Login: undefined;
   Onboard: undefined;
   Signup: undefined;
-  Gender: { token: string };
-  Age: { token: string; gender: "male" | "female" };
-  Weight: { token: string; gender: "male" | "female"; age: string };
+  Gender: undefined;
+  Age: { gender: "male" | "female" };
+  Weight: { gender: "male" | "female"; age: string };
   Height: {
-    token: string;
     gender: "male" | "female";
     age: string;
     weight: number;
   };
   Sport: {
-    token: string;
     gender: "male" | "female";
     age: string;
     weight: number;
     height: string;
   };
   About: {
-    token: string;
     gender: "male" | "female";
     age: string;
     weight: number;
@@ -35,7 +32,6 @@ export type AppRoutes = {
     sport: number;
   };
   Success: {
-    token: string;
     gender: "male" | "female";
     age: string;
     weight: number;

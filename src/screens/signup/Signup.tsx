@@ -6,7 +6,7 @@ import { AppNavigationProps } from "@/navigators/navigation";
 import { globalStyles } from "@/styles/globalStyles";
 import RNBounceable from "@freakycoder/react-native-bounceable";
 import React, { useState } from "react";
-import { StyleSheet, Switch, View } from "react-native";
+import { Platform, StyleSheet, Switch, View } from "react-native";
 import Sms from "@/assets/svg/sms.svg";
 import User from "@/assets/svg/frame.svg";
 import Phone from "@/assets/svg/mobile.svg";
@@ -137,15 +137,17 @@ const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
           error={errors.email}
           touched={touched.email}
         />
-        <TextInput
-          placeholder={t("phone_placeholder")}
-          leftIcon={<Phone />}
-          keyboardType="number-pad"
-          onChangeText={handleChange("phone_number")}
-          onBlur={handleBlur("phone_number")}
-          error={errors.phone_number}
-          touched={touched.phone_number}
-        />
+        {Platform.OS == "android" && (
+          <TextInput
+            placeholder={t("phone_placeholder")}
+            leftIcon={<Phone />}
+            keyboardType="number-pad"
+            onChangeText={handleChange("phone_number")}
+            onBlur={handleBlur("phone_number")}
+            error={errors.phone_number}
+            touched={touched.phone_number}
+          />
+        )}
         <TextInput
           placeholder={t("password_placeholder")}
           onChangeText={handleChange("password")}

@@ -18,7 +18,7 @@ export default {
   welcome_back: "Welcome back!",
   email_placeholder: "Email",
   name_placeholder: "Name",
-  phone_placeholder: "Phone Number",
+  phone_placeholder: "Phone Number (optional)",
   password_placeholder: "Password",
   confirm_password_placeholder: "Confirm Password",
   or: "or",

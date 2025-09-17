@@ -18,7 +18,7 @@ export default {
   welcome_back: "مرحبًا بعودتك!",
   email_placeholder: "البريد الإلكتروني",
   name_placeholder: "الاسم",
-  phone_placeholder: "رقم الهاتف",
+  phone_placeholder: "رقم الهاتف (اختياري)",
   password_placeholder: "كلمة المرور",
   confirm_password_placeholder: "تأكيد كلمة المرور",
   or: "أو",

@@ -1,19 +1,19 @@
-import {Text, theme} from '@/components/theme';
-import {globalStyles} from '@/styles/globalStyles';
-import React from 'react';
+import { Text, theme } from "@/components/theme";
+import { globalStyles } from "@/styles/globalStyles";
+import React from "react";
 import {
   Dimensions,
   ImageBackground,
   Platform,
   StyleSheet,
   View,
-} from 'react-native';
-import Back from '@/assets/svg/arrow-left.svg';
-import RNBounceable from '@freakycoder/react-native-bounceable';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {AppRoutes} from '@/navigators/navigation';
-import RoundButton from '@/components/roundButton';
-import {useTranslation} from 'react-i18next';
+} from "react-native";
+import Back from "@/assets/svg/arrow-left.svg";
+import RNBounceable from "@freakycoder/react-native-bounceable";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { AppRoutes } from "@/navigators/navigation";
+import RoundButton from "@/components/roundButton";
+import { useTranslation } from "react-i18next";
 
 interface SlideProps {
   item: {
@@ -29,7 +29,7 @@ interface SlideProps {
   backflag?: boolean;
 }
 
-const {width, height} = Dimensions.get('screen');
+const { width, height } = Dimensions.get("screen");
 
 const SlideItem = ({
   item,
@@ -39,21 +39,22 @@ const SlideItem = ({
   backflag,
   local,
 }: SlideProps) => {
-  const {t} = useTranslation();
-  const imageSource = local ? item.main_img : {uri: item.main_img};
+  const { t } = useTranslation();
+  const imageSource = local ? item.main_img : { uri: item.main_img };
   return (
     <View style={styles.container}>
       <ImageBackground
         resizeMode="cover"
         source={imageSource}
-        defaultSource={require('@/assets/images/workout.png')}
+        defaultSource={require("@/assets/images/workout.png")}
         style={styles.logo}
         borderBottomLeftRadius={30}
-        borderBottomRightRadius={30}>
+        borderBottomRightRadius={30}
+      >
         <View style={[globalStyles.line2, styles.margin]}>
           {backflag ? (
             <RoundButton onPress={() => nav?.goBack()}>
-              <Back color={theme.colors.white} />
+              <Back color={theme.colors.black} />
             </RoundButton>
           ) : index != 0 ? (
             <RoundButton onPress={scrollBack}>
@@ -63,9 +64,9 @@ const SlideItem = ({
             <View />
           )}
           {!backflag && (
-            <RNBounceable onPress={() => nav?.navigate('Login')}>
+            <RNBounceable onPress={() => nav?.navigate("Login")}>
               <Text variant="poppins16black_regular" color="white">
-                {t('skip')}
+                {t("skip")}
               </Text>
             </RNBounceable>
           )}
@@ -80,7 +81,8 @@ const SlideItem = ({
         textAlign="center"
         lineHeight={27}
         variant="poppins16black_regular"
-        color="gray">
+        color="gray"
+      >
         {item.subtitle}
       </Text>
     </View>
@@ -89,13 +91,13 @@ const SlideItem = ({
 const styles = StyleSheet.create({
   container: {
     width: width,
-    height: Platform.OS == 'android' ? height * 0.6 : height * 0.65,
+    height: Platform.OS == "android" ? height * 0.6 : height * 0.65,
   },
   logo: {
     width: width,
-    height: Platform.OS == 'android' ? height * 0.6 : height * 0.65,
+    height: Platform.OS == "android" ? height * 0.6 : height * 0.65,
   },
-  margin: {marginTop: '20%', marginHorizontal: '5%'},
+  margin: { marginTop: "20%", marginHorizontal: "5%" },
 });
 
 export default SlideItem;

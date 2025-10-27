@@ -11,106 +11,292 @@ import PackageSkeleton from "@/components/packageSkeleton";
 import { IWorkoutPlans, useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/components/toast";
-import * as IAP from "react-native-iap";
+import useRevenueCat from "@/hooks/useRevenueCat";
+import Purchases, { PurchasesPackage } from "react-native-purchases";
+import { useSubscribeExercise } from "@/hooks/useSubscribeExercise";
+import { CommonActions } from "@react-navigation/native";
+
+interface IWorkoutPlansWithRC extends IWorkoutPlans {
+  rcPackage?: PurchasesPackage;
+}
 
 const WorkoutPlan = ({ navigation }: AppNavigationProps<"WorkoutPlan">) => {
   const { t, i18n } = useTranslation();
   const [active, setActive] = useState<number>();
-  const subscriptionSkus =
-    Platform.select({
-      ios: [
-        "evolveFitness123",
-        "evolveFitnessPro",
-        "evolve_one",
-        "evolve_guided",
-        "evolve_kick",
-      ],
-      android: [""],
-    }) || [];
-
   const { data, isPending } = useWorkoutPlans();
 
-  const [item, setItem] = useState<IWorkoutPlans | undefined>();
-  const [iosSubs, setIosSubs] = useState<IWorkoutPlans[]>([]);
+  const [item, setItem] = useState<IWorkoutPlansWithRC | undefined>();
+  const [enhancedData, setEnhancedData] = useState<IWorkoutPlansWithRC[]>([]);
+  const { currentOffering, customerInfo } = useRevenueCat();
+  const [isRevenueCatLoading, setIsRevenueCatLoading] = useState(false);
 
-  // Convert IAP subscription object to IWorkoutPlans type, mapping pricingId and packageId from data if available
-  function convertSubToWorkoutPlan(
-    sub: any,
-    data: IWorkoutPlans[] | undefined
-  ): IWorkoutPlans {
-    // Try to find a matching plan from data by productId
-    let pricingId = sub.productId;
-    let packageId = sub.productId;
-    if (data && Array.isArray(data)) {
-      const foundPlan = data.find((plan) => {
-        // Try to match by productId or by name/title
-        return (
-          plan.id === sub.productId ||
-          plan.name === sub.title ||
-          plan.pricings?.some((p) => p.package_id === sub.productId)
+  // Also fix the onError callback to prevent infinite loops
+  const { isPending: subPending, mutate: subExercise } = useSubscribeExercise({
+    onSuccess() {
+      if (Platform.OS === "ios") {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "MainTab" }],
+          })
         );
+      }
+    },
+    onError(err: any) {
+      console.log("SubExercise error:", err);
+
+      // Prevent infinite loops by not calling setState repeatedly
+      if (err?.errors?.[0]?.message) {
+        showToast("errorToast", err.errors[0].message, "top");
+      } else {
+        showToast("errorToast", "Subscription failed", "top");
+      }
+
+      // Don't trigger any other state updates that could cause loops
+    },
+  });
+
+  // ...existing code...
+
+  const handleItemClicked = React.useCallback(
+    (item: IWorkoutPlans) => {
+      const enriched = enhancedData.find((d) => d.id === item.id);
+      if (Platform.OS === "ios" && !enriched?.rcPackage) {
+        showToast(
+          "errorToast",
+          "This plan is not available for purchase",
+          "top"
+        );
+        return;
+      }
+      setActive(Number(item.id));
+      setItem(enriched || item); // Android = original, iOS = enriched
+    },
+    [enhancedData]
+  );
+
+  // ...existing code...
+
+  // ...existing code...
+
+  useEffect(() => {
+    if (!data) {
+      setEnhancedData([]);
+      return;
+    }
+
+    if (Platform.OS === "ios") {
+      setIsRevenueCatLoading(true);
+    }
+
+    if (Platform.OS === "ios" && currentOffering?.availablePackages) {
+      console.log("=== RevenueCat Package Matching Debug ===");
+
+      const updatedData = data.map((backendItem): IWorkoutPlansWithRC => {
+        const matchingRcPackage = currentOffering.availablePackages.find(
+          (rcPackage) => {
+            const productId = rcPackage.product.identifier.toLowerCase();
+            const productTitle = rcPackage.product.title.toLowerCase();
+
+            return (
+              backendItem.pricings?.some(
+                (pricing) =>
+                  String(pricing.package_id).toLowerCase() === productId ||
+                  String(pricing.id).toLowerCase() === productId
+              ) ||
+              backendItem.name.toLowerCase() === productTitle ||
+              productId.includes(backendItem.name.toLowerCase())
+            );
+          }
+        );
+
+        if (matchingRcPackage) {
+          console.log(
+            `✅ Match found: ${backendItem.name} <-> ${matchingRcPackage.product.identifier}`
+          );
+        } else {
+          console.log(
+            `❌ No RC package found for: ${backendItem.name} (ID: ${backendItem.id})`
+          );
+        }
+
+        return {
+          ...backendItem,
+          rcPackage: matchingRcPackage ?? undefined, // only set for iOS
+        };
       });
-      if (foundPlan && foundPlan.pricings && foundPlan.pricings.length > 0) {
-        // Use the first pricing that matches productId, else fallback to first pricing
-        const foundPricing =
-          foundPlan.pricings.find((p) => p.package_id === sub.productId) ||
-          foundPlan.pricings[0];
-        pricingId = foundPricing.id;
-        packageId = foundPricing.package_id;
+
+      setEnhancedData(updatedData);
+      setIsRevenueCatLoading(false);
+    } else {
+      // Android → leave as is
+      setEnhancedData(data.map((item) => ({ ...item })));
+      setIsRevenueCatLoading(false);
+    }
+  }, [currentOffering, data]);
+
+  // ...existing code...
+
+  const handlePurchase = async (selectedItem: IWorkoutPlans) => {
+    try {
+      if (!selectedItem.rcPackage) {
+        showToast("errorToast", "Invalid package selected", "top");
+        return;
+      }
+
+      // Check if user is already subscribed before attempting purchase
+      if (
+        customerInfo?.entitlements.active &&
+        Object.keys(customerInfo.entitlements.active).length > 0
+      ) {
+        console.log(
+          "User already has active subscription:",
+          Object.keys(customerInfo.entitlements.active)
+        );
+
+        console.log(
+          "User wants to upgrade/change plan. Attempting purchase..."
+        );
+        // Don't restore - let them upgrade/change their plan
+        // Continue to purchase flow instead of returning
+      }
+
+      const purchaseResult = await Purchases.purchasePackage(
+        selectedItem.rcPackage
+      );
+
+      console.log("Purchase result:", purchaseResult);
+
+      // Check if the purchase was successful and user has active entitlements
+      const hasActiveEntitlements =
+        purchaseResult.customerInfo.entitlements.active &&
+        Object.keys(purchaseResult.customerInfo.entitlements.active).length > 0;
+
+      if (hasActiveEntitlements) {
+        console.log("Purchase successful, active entitlements found");
+        showToast("successToast", "Subscription updated successfully!", "top");
+
+        // Call backend API with the NEW selected package (not the old one)
+        subExercise({
+          package_id: Number(selectedItem.pricings[0].package_id),
+          pricing_id: selectedItem.pricings[0].id,
+          payment_method: "iap",
+          app_user_id: customerInfo?.originalAppUserId,
+          coupon_code: undefined,
+          apple_receipt: "a",
+          expected_entitlement: Object.keys(
+            purchaseResult.customerInfo.entitlements.active
+          )[0],
+        });
+      } else {
+        console.log("Purchase completed but no active entitlements found");
+        showToast(
+          "errorToast",
+          "Purchase completed but subscription not active",
+          "top"
+        );
+      }
+    } catch (error: any) {
+      console.error("Purchase error:", error);
+
+      // Handle specific error cases
+      if (error.userCancelled) {
+        console.log("User cancelled purchase");
+        showToast("errorToast", "Purchase cancelled", "top");
+      } else if (error.code === "PURCHASE_NOT_ALLOWED_ERROR") {
+        console.log("Purchases not allowed on device");
+        showToast("errorToast", "Purchases not allowed on this device", "top");
+      } else if (error.code === "PAYMENT_PENDING_ERROR") {
+        console.log("Payment is pending");
+        showToast("errorToast", "Payment is pending", "top");
+      } else if (error.code === "PRODUCT_ALREADY_PURCHASED_ERROR") {
+        console.log("Product already purchased");
+
+        // Check if this is the SAME product they already have
+        const currentEntitlements = Object.keys(
+          customerInfo?.entitlements.active || {}
+        );
+        const isUpgrade = !currentEntitlements.some((entitlement) =>
+          entitlement.toLowerCase().includes(selectedItem.name.toLowerCase())
+        );
+
+        if (isUpgrade) {
+          // They're trying to upgrade - show error since they already own this specific product
+          showToast(
+            "errorToast",
+            "You already own this subscription plan",
+            "top"
+          );
+        } else {
+          // They're trying to buy the same plan they already have - restore it
+          try {
+            subExercise({
+              package_id: Number(selectedItem.pricings[0].package_id),
+              pricing_id: selectedItem.pricings[0].id,
+              payment_method: "iap",
+              app_user_id: customerInfo?.originalAppUserId,
+              coupon_code: undefined,
+              apple_receipt: "a",
+              expected_entitlement: currentEntitlements[0],
+            });
+
+            showToast(
+              "successToast",
+              "Subscription restored successfully!",
+              "top"
+            );
+          } catch (restoreError) {
+            showToast("errorToast", "Failed to restore subscription", "top");
+          }
+        }
+      } else if (error.code === "RECEIPT_ALREADY_IN_USE_ERROR") {
+        console.log("Receipt already in use");
+        showToast(
+          "errorToast",
+          "This purchase is already associated with another account",
+          "top"
+        );
+      } else {
+        console.log("Unknown purchase error:", error.message);
+        showToast("errorToast", error.message || "Purchase failed", "top");
       }
     }
-    return {
-      id: sub.productId, // This is a string, but IWorkoutPlans expects number. Consider parsing if needed.
-      name: sub.title,
-      name_ar: sub.title, // Adjust if Arabic name is available
-      description: sub.description,
-      description_ar: sub.description, // Adjust if Arabic description is available
-      type: sub.type || "subs",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      pricings: [
-        {
-          id: pricingId,
-          package_id: packageId,
-          price: Number(sub.price),
-          number_of_days:
-            sub.subscriptionPeriodUnitIOS === "MONTH"
-              ? Number(sub.subscriptionPeriodNumberIOS) * 30
-              : Number(sub.subscriptionPeriodNumberIOS),
-          title: sub.title,
-          title_ar: sub.title, // Adjust if Arabic title is available
-          is_active: true,
-        },
-      ],
-    };
-  }
+  };
 
-  const handleItemClicked = React.useCallback((item: IWorkoutPlans) => {
-    setItem(item);
-  }, []);
-  useEffect(() => {
-    if (Platform.OS === "ios") {
-      const initIAP = async () => {
-        try {
-          const subs = await IAP.getSubscriptions({ skus: subscriptionSkus });
-          const mapped = (subs as any[]).map((sub) =>
-            convertSubToWorkoutPlan(sub, data)
-          );
-          mapped.sort(
-            (a, b) => Number(a.pricings[0].price) - Number(b.pricings[0].price)
-          );
-          setIosSubs(mapped);
-          console.log({ subs });
-        } catch (error) {
-          console.error("IAP Error:", error);
-        }
-      };
-      initIAP();
-      return () => {
-        IAP.endConnection();
-      };
+  // Update the restore function to not automatically select the first item
+  const handleRestorePurchases = async () => {
+    try {
+      console.log("Restoring purchases...");
+      const restoredCustomerInfo = await Purchases.restorePurchases();
+
+      if (
+        restoredCustomerInfo.entitlements.active &&
+        Object.keys(restoredCustomerInfo.entitlements.active).length > 0
+      ) {
+        console.log(
+          "Active entitlements found after restore:",
+          Object.keys(restoredCustomerInfo.entitlements.active)
+        );
+
+        showToast("successToast", "Purchases restored successfully!", "top");
+
+        // Navigate to main tab since they have active subscriptions
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "MainTab" }],
+          })
+        );
+      } else {
+        showToast("errorToast", "No purchases found to restore", "top");
+      }
+    } catch (error: any) {
+      console.error("Restore error:", error);
+      showToast("errorToast", "Failed to restore purchases", "top");
     }
-  }, [data]);
+  };
+
+  // ...existing code...
 
   return (
     <View style={globalStyles.container}>
@@ -132,48 +318,64 @@ const WorkoutPlan = ({ navigation }: AppNavigationProps<"WorkoutPlan">) => {
         <ScrollView showsHorizontalScrollIndicator={false} horizontal>
           {isPending ? (
             <PackageSkeleton />
-          ) : Platform.OS === "ios" ? (
-            iosSubs?.map((item, index) => (
-              <WorkoutSelector
-                key={item.id}
-                item={item}
-                active={active}
-                setActive={setActive}
-                onItemSelected={handleItemClicked}
-                islast={index === iosSubs.length - 1}
-              />
-            ))
           ) : (
-            data?.map((item, index) => (
+            enhancedData?.map((item, index) => (
               <WorkoutSelector
                 key={item.id}
                 item={item}
                 active={active}
                 setActive={setActive}
                 onItemSelected={handleItemClicked}
-                islast={index === data.length - 1}
+                islast={index === enhancedData.length - 1}
               />
             ))
           )}
         </ScrollView>
       </View>
       <View style={styles.container}>
+        {Platform.OS === "ios" && (
+          <RNBounceable onPress={handleRestorePurchases}>
+            <Text variant="poppins14black_regular" color="apptheme">
+              {t("restore_purchases", "Restore Purchases")}
+            </Text>
+          </RNBounceable>
+        )}
         <BaseButton
           label={t("next")}
-          onPress={() =>
-            item && item.pricings
-              ? navigation.navigate("Payment", {
-                  package_id: item?.pricings?.[0]?.package_id,
-                  pricing_id: item?.pricings?.[0]?.id,
-                  pay_details: {
-                    title: i18n.language == "ar" ? item?.name_ar : item?.name,
-                    price: item?.pricings?.[0]?.price,
-                    number_of_days: item?.pricings?.[0]?.number_of_days,
-                  },
-                  productId: item.id.toString(),
-                })
-              : showToast("errorToast", "Please select a plan", "top")
+          isLoading={subPending || isRevenueCatLoading}
+          disabled={
+            !item ||
+            (Platform.OS === "ios" && !item.rcPackage) ||
+            subPending ||
+            isRevenueCatLoading
           }
+          onPress={() => {
+            if (!item || !item.pricings) {
+              showToast("errorToast", "Please select a plan", "top");
+              return;
+            }
+
+            if (Platform.OS === "ios") {
+              // iOS: must use RevenueCat
+              if (!item.rcPackage) {
+                showToast("errorToast", "Invalid package selected", "top");
+                return;
+              }
+              handlePurchase(item);
+            } else {
+              // Android: backend values only
+              navigation.navigate("Payment", {
+                package_id: item.pricings[0].package_id,
+                pricing_id: item.pricings[0].id,
+                pay_details: {
+                  title: i18n.language === "ar" ? item.name_ar : item.name,
+                  price: item.pricings[0].price,
+                  number_of_days: item.pricings[0].number_of_days,
+                },
+                productId: item.id.toString(),
+              });
+            }
+          }}
         />
       </View>
     </View>

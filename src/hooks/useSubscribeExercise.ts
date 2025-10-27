@@ -6,8 +6,10 @@ export interface ISubscribeExerciseArgs {
   package_id: number | undefined;
   pricing_id: number | undefined;
   coupon_code: string | undefined;
-  apple_receipt?: string | undefined;
   payment_method: "tap" | "iap";
+  app_user_id?: string;
+  apple_receipt?: string;
+  expected_entitlement?: string;
 }
 
 export type ISubscribeExerciseResult = {
@@ -22,7 +24,7 @@ async function SubscribeExercise(
 ) {
   console.log({ args });
 
-  const endpoint = `/payments/subscribe-package`;
+  const endpoint = ``;
   const res = await axios.post<ISubscribeExerciseResult>(endpoint, args, {
     headers: {
       Authorization: `Bearer ${access_token}`,

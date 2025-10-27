@@ -97,6 +97,7 @@ const Weight = ({ navigation, route }: AppNavigationProps<"Weight">) => {
               onChangeText={handleInputChange}
               keyboardType="numeric"
               textAlign="center"
+              returnKeyType="done"
             />
             <Text variant="poppins12black_bold" color="apptheme">
               {active == 1 ? t("kg") : t("lb")}

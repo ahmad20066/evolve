@@ -20,14 +20,19 @@ const ExercisesItem = ({ item, onItemClicked }: MealProps) => {
       onPress={() => onItemClicked(item)}
     >
       <View style={[globalStyles.line, { flex: 1 }]}>
-        <Image source={{ uri: `${item.image_urls[0]}` }} style={styles.img} />
+        <Image
+          source={{ uri: `${item?.image_urls?.[0] || item?.image}` }}
+          style={styles.img}
+        />
         <View style={styles.details}>
           <Text
             textAlign="left"
             variant="poppins12black_medium"
             numberOfLines={2}
           >
-            {i18n.language == "ar" ? item.name_ar : item.name}
+            {i18n.language == "ar"
+              ? item.name_ar || item?.title
+              : item.name || item?.title}
           </Text>
           <View style={globalStyles.line}>
             <Text

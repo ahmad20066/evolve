@@ -36,47 +36,6 @@ const Subscription = ({ navigation }: AppNavigationProps<"Subscription">) => {
       showToast("errorToast", err.errors[0].message, "top");
     },
   });
-  const handleRestore = async () => {
-    try {
-      // Fetch all available purchases (non-consumables + subscriptions)
-      const purchases = await RNIap.getAvailablePurchases();
-      if (purchases.length === 0) {
-        showToast(
-          "errorToast",
-          "No Purchases We couldn’t find any active subscriptions.",
-          "top"
-        );
-        return;
-      }
-      // If you have multiple subscription productIds, check against them
-      const subscription = purchases.find((p) =>
-        [
-          "evolveFitness123",
-          "evolveFitnessPro",
-          "evolve_one",
-          "evolve_guided",
-          "evolve_kick",
-        ].includes(p.productId)
-      );
-      if (subscription) {
-        showToast(
-          "successToast",
-          "Your subscription has been restored!",
-          "top"
-        );
-        // :point_right: update your state/redux with subscription info here
-      } else {
-        showToast(
-          "errorToast",
-          "No Active Subscription, Your past plans may have expired.",
-          "top"
-        );
-      }
-    } catch (err) {
-      console.error("Restore error", err);
-      showToast("errorToast", "Failed to restore purchases.", "top");
-    }
-  };
   const { mutate, isPending } = useCancelSub({
     onSuccess(data) {
       showToast("successToast", data.message, "top");
@@ -143,105 +102,92 @@ const Subscription = ({ navigation }: AppNavigationProps<"Subscription">) => {
         <View />
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {items.length == 0 ? (
-          <>
-            <Text textAlign="center" mt="xxl" variant="poppins14black_regular">
-              {t("no_sub")}
+        {items?.map((item) => (
+          <View key={item.key}>
+            <Text
+              textAlign="left"
+              mt="l"
+              mb="m"
+              variant="poppins16black_semibold"
+            >
+              {item.type}
             </Text>
-            <BaseButton label={t("restore_purchase")} onPress={handleRestore} />
-          </>
-        ) : (
-          items?.map((item) => (
-            <View key={item.key}>
-              <Text
-                textAlign="left"
-                mt="l"
-                mb="m"
-                variant="poppins16black_semibold"
-              >
-                {item.type}
-              </Text>
-              <View key={item.key} style={styles.item}>
-                <View style={globalStyles.line}>
-                  <View style={styles.box}>
-                    <Crown color={theme.colors.black} />
-                  </View>
-                  <View>
-                    <Text
-                      mb="s"
-                      variant="poppins16black_semibold"
-                      textTransform="capitalize"
-                      textAlign="left"
-                      numberOfLines={2}
-                      style={styles.title}
-                      color="apptheme"
-                    >
-                      {item.timePlan} {t("plan")}
-                    </Text>
-                    <Text variant="poppins12black_regular">
-                      {item.remainingDays} {item.expiryTime}
-                    </Text>
-                  </View>
+            <View key={item.key} style={styles.item}>
+              <View style={globalStyles.line}>
+                <View style={styles.box}>
+                  <Crown color={theme.colors.black} />
                 </View>
-                <View style={styles.smallbox}>
+                <View>
                   <Text
-                    textAlign="left"
-                    variant="poppins12black_regular"
                     mb="s"
+                    variant="poppins16black_semibold"
+                    textTransform="capitalize"
+                    textAlign="left"
+                    numberOfLines={2}
+                    style={styles.title}
+                    color="apptheme"
                   >
-                    {item.packageName}
+                    {item.timePlan} {t("plan")}
                   </Text>
-                  <View style={globalStyles.line}>
-                    <Text variant="poppins12black_semibold" lineHeight={13}>
-                      SAR
-                    </Text>
-                    <Text variant="poppins18black_semibold" lineHeight={35}>
-                      {item.price}
-                    </Text>
-                    <Text variant="poppins16black_regular" lineHeight={35}>
-                      /{item.timePlan == "monthly" ? "Month" : "Week"}
-                    </Text>
-                  </View>
+                  <Text variant="poppins12black_regular">
+                    {item.remainingDays} {item.expiryTime}
+                  </Text>
                 </View>
-                <Text
-                  variant="poppins12black_regular"
-                  color="gray"
-                  mb="s"
-                  textAlign="left"
-                >
-                  {item.desc}
-                </Text>
-                <BaseButton
-                  label={t("renew")}
-                  disabled={mealPending || workoutPending}
-                  isLoading={mealPending || workoutPending}
-                  onPress={() =>
-                    item.type == "Meal Plan"
-                      ? renewMeal({ id: item.key! })
-                      : renewWorkout({ id: item.key! })
-                  }
-                />
-                <RNBounceable
-                  style={styles.cancel}
-                  onPress={() =>
-                    mutate({
-                      id: item.key!,
-                      type: item.type == "Meal Plan" ? "diet" : "fitness",
-                    })
-                  }
-                >
-                  {isPending ? (
-                    <ActivityIndicator color={theme.colors.apptheme} />
-                  ) : (
-                    <Text variant="poppins12black_regular" color="cancel">
-                      {t("cancel_membership")}
-                    </Text>
-                  )}
-                </RNBounceable>
               </View>
+              <View style={styles.smallbox}>
+                <Text textAlign="left" variant="poppins12black_regular" mb="s">
+                  {item.packageName}
+                </Text>
+                <View style={globalStyles.line}>
+                  <Text variant="poppins12black_semibold" lineHeight={13}>
+                    SAR
+                  </Text>
+                  <Text variant="poppins18black_semibold" lineHeight={35}>
+                    {item.price}
+                  </Text>
+                  <Text variant="poppins16black_regular" lineHeight={35}>
+                    /{item.timePlan == "monthly" ? "Month" : "Week"}
+                  </Text>
+                </View>
+              </View>
+              <Text
+                variant="poppins12black_regular"
+                color="gray"
+                mb="s"
+                textAlign="left"
+              >
+                {item.desc}
+              </Text>
+              <BaseButton
+                label={t("renew")}
+                disabled={mealPending || workoutPending}
+                isLoading={mealPending || workoutPending}
+                onPress={() =>
+                  item.type == "Meal Plan"
+                    ? renewMeal({ id: item.key! })
+                    : renewWorkout({ id: item.key! })
+                }
+              />
+              <RNBounceable
+                style={styles.cancel}
+                onPress={() =>
+                  mutate({
+                    id: item.key!,
+                    type: item.type == "Meal Plan" ? "diet" : "fitness",
+                  })
+                }
+              >
+                {isPending ? (
+                  <ActivityIndicator color={theme.colors.apptheme} />
+                ) : (
+                  <Text variant="poppins12black_regular" color="cancel">
+                    {t("cancel_membership")}
+                  </Text>
+                )}
+              </RNBounceable>
             </View>
-          ))
-        )}
+          </View>
+        ))}
       </ScrollView>
     </View>
   );

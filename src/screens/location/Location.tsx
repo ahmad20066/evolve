@@ -28,7 +28,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Location = ({ navigation, route }: AppNavigationProps<"Location">) => {
-  const reff = useRef<any>();
+  const reff = useRef<any>(null);
   const { t } = useTranslation();
   const { delivery_id, meal_plan_id } = route.params;
   const [region, setRegion] = useState({

@@ -45,14 +45,14 @@ const Success = ({ navigation, route }: AppNavigationProps<"Success">) => {
         <Text mt="xl" variant="poppins18black_semibold">
           {t("all_set")}
         </Text>
-        <Text
+        {/* <Text
           mt="s"
           textAlign="center"
           variant="poppins14black_regular"
           color="gray"
         >
           {t("success")}
-        </Text>
+        </Text> */}
       </View>
       <BaseButton
         label={t("save")}

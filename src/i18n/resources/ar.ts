@@ -205,4 +205,6 @@ export default {
   delete_account_confirm: "هل أنت متأكد أنك تريد حذف حسابك؟",
   no_meals: "لا توجد وجبات متاحة",
   restore_purchase: "استعادة المشتريات",
+  no_purchases_found: "لم يتم العثور على مشتريات",
+  purchases_restored: "تمت استعادة المشتريات بنجاح",
 };

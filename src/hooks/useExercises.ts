@@ -17,6 +17,9 @@ export type IExercises = {
   updatedAt: string;
   cooling_time: number;
   status: string;
+  image?: string;
+  title?: string;
+  title_ar?: string;
 };
 async function getExercises(token?: string) {
   const endpoint = `/fitness/exercises`;

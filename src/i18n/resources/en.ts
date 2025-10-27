@@ -210,5 +210,7 @@ export default {
   delete_account_confirm:
     "Are you sure you want to delete your account? This action cannot be undone.",
   no_meals: "No meals available",
-  restore_purchase: "Restore Purchase",
+  restore_purchase: "Restore Purchases",
+  no_purchases_found: "No purchases found",
+  purchases_restored: "Purchases restored successfully",
 };

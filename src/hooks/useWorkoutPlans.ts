@@ -2,6 +2,7 @@ import { axios, IApiError } from "@/hooks/axios.config";
 import { useAppSelector } from "@/store";
 import { IPricing } from "@/types/pricing";
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { PurchasesPackage } from "react-native-purchases";
 
 export type IWorkoutPlans = {
   id: number | string;
@@ -13,6 +14,7 @@ export type IWorkoutPlans = {
   createdAt: string;
   updatedAt: string;
   pricings: IPricing[];
+  rcPackage?: PurchasesPackage; // Add this optional property
 };
 
 async function getWorkoutPlans(token?: string) {

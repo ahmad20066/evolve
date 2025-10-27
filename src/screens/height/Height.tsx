@@ -97,6 +97,7 @@ const Height = ({ navigation, route }: AppNavigationProps<"Height">) => {
               onChangeText={handleInputChange}
               keyboardType="numeric"
               textAlign="center"
+              returnKeyType="done"
             />
             <Text variant="poppins12black_bold" color="apptheme">
               {active == 1 ? t("cm") : t("ft")}

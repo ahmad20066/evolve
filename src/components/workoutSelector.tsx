@@ -93,7 +93,7 @@ const WorkoutSelector = ({
           fontSize={24}
           lineHeight={41}
         >
-          {item?.pricings?.[0]?.price}
+          {item?.pricings?.[0]?.price.toFixed(2)}
         </Text>
         <Text variant="poppins12black_regular" color="gray" lineHeight={41}>
           / {calculateMonths(item?.pricings?.[0]?.number_of_days)} month

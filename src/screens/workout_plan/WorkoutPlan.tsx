@@ -44,14 +44,12 @@ const WorkoutPlan = ({ navigation }: AppNavigationProps<"WorkoutPlan">) => {
     },
     onError(err: any) {
       console.log("SubExercise error:", err);
-
       // Prevent infinite loops by not calling setState repeatedly
       if (err?.errors?.[0]?.message) {
         showToast("errorToast", err.errors[0].message, "top");
       } else {
         showToast("errorToast", "Subscription failed", "top");
       }
-
       // Don't trigger any other state updates that could cause loops
     },
   });

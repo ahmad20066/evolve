@@ -1,6 +1,6 @@
-import {axios, IApiError} from '@/hooks/axios.config';
-import {useAppSelector} from '@/store';
-import {useQuery, UseQueryOptions} from '@tanstack/react-query';
+import { axios, IApiError } from "@/hooks/axios.config";
+import { useAppSelector } from "@/store";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 export type IMealPlans = {
   id: number;
@@ -11,6 +11,7 @@ export type IMealPlans = {
   price_monthly: number;
   createdAt: string;
   updatedAt: string;
+  number_of_days: number;
   types: {
     id: number;
     title: string;
@@ -19,26 +20,30 @@ export type IMealPlans = {
   }[];
 };
 
-async function getMealPlans(token?: string) {
+async function getMealPlans(number_of_meals: number, token?: string) {
   const endpoint = `/diet/meal-plans`;
   const res = await axios.get<IMealPlans[]>(endpoint, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    params: {
+      number_of_meals,
+    },
   });
   return res.data;
 }
 
-export const useMealPans = (
+export const useMealPlans = (
+  number_of_meals: number,
   config?: Omit<
     UseQueryOptions<IMealPlans[], IApiError>,
-    'queryKey' | 'queryFn'
-  >,
+    "queryKey" | "queryFn"
+  >
 ) => {
-  const {access_token} = useAppSelector(state => state.local);
+  const { access_token } = useAppSelector((state) => state.local);
   return useQuery({
-    queryKey: ['meal-Plans'],
-    queryFn: () => getMealPlans(access_token),
+    queryKey: ["meal-Plans", number_of_meals],
+    queryFn: () => getMealPlans(number_of_meals, access_token),
     retry: 2,
     ...config,
   });

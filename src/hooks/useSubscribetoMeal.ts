@@ -13,6 +13,7 @@ export interface ISubscribeMealsArgs {
   delivery_notes: string | undefined;
   state: string | undefined;
   coupon_code: string | undefined;
+  notes: string | undefined;
 }
 
 export type ISubscribeMealsResult = {

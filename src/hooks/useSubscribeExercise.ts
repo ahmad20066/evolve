@@ -10,6 +10,7 @@ export interface ISubscribeExerciseArgs {
   app_user_id?: string;
   apple_receipt?: string;
   expected_entitlement?: string;
+  notes: string;
 }
 
 export type ISubscribeExerciseResult = {
@@ -22,9 +23,7 @@ async function SubscribeExercise(
   args: ISubscribeExerciseArgs,
   access_token?: string
 ) {
-  console.log({ args });
-
-  const endpoint = ``;
+  const endpoint = `/payments/subscribe-package`;
   const res = await axios.post<ISubscribeExerciseResult>(endpoint, args, {
     headers: {
       Authorization: `Bearer ${access_token}`,

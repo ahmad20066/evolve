@@ -57,7 +57,10 @@ export type AppRoutes = {
   Profile: undefined;
   Subscription: undefined;
   Menu: undefined;
-  DeliveryTime: { meal_plan_id: number };
+  DeliveryTime: {
+    meal_plan_id: number;
+    pay_details: { title: string; price: number; number_of_days: number };
+  };
   MyMeals: undefined;
   Payment: {
     pricing_id?: number;
@@ -86,7 +89,11 @@ export type AppRoutes = {
   Info2: undefined;
   Info3: undefined;
   Exercises: { id: number };
-  Location: { meal_plan_id: number; delivery_id: number | undefined };
+  Location: {
+    meal_plan_id: number;
+    delivery_id: number | undefined;
+    pay_details: { title: string; price: number; number_of_days: number };
+  };
   TermsnPolicy: { policy: boolean };
   Faq: undefined;
   Order: undefined;

@@ -30,7 +30,7 @@ const LoginSchema = Yup.object().shape({
 const Location = ({ navigation, route }: AppNavigationProps<"Location">) => {
   const reff = useRef<any>(null);
   const { t } = useTranslation();
-  const { delivery_id, meal_plan_id } = route.params;
+  const { delivery_id, meal_plan_id, pay_details } = route.params;
   const [region, setRegion] = useState({
     latitude: 21.5834,
     longitude: 39.167505,
@@ -60,6 +60,7 @@ const Location = ({ navigation, route }: AppNavigationProps<"Location">) => {
         navigation.navigate("Payment", {
           meal_plan_id,
           delivery_id,
+          pay_details,
           address: {
             street: value.street,
             city: value.city,

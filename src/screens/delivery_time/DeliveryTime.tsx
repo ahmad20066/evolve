@@ -16,7 +16,7 @@ const DeliveryTime = ({
   navigation,
   route,
 }: AppNavigationProps<"DeliveryTime">) => {
-  const { meal_plan_id } = route.params;
+  const { meal_plan_id, pay_details } = route.params;
   const { t, i18n } = useTranslation();
   const { data } = useDeliveryTimes();
   const [active, setactive] = useState<number | null>(null);
@@ -80,6 +80,7 @@ const DeliveryTime = ({
               navigation.navigate("Location", {
                 delivery_id: active,
                 meal_plan_id,
+                pay_details,
               });
             }
           }}

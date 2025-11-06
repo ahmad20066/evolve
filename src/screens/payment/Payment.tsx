@@ -50,6 +50,7 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
   const [coupon, setcoupon] = useState("");
   const [discount, setdiscount] = useState<number>();
   const [newPrice, setnewPrice] = useState<number>();
+  const [notes, setnotes] = useState("");
 
   const handleBackToDashboardClicked = React.useCallback(() => {
     setvisible(false);
@@ -126,6 +127,7 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
         pricing_id,
         coupon_code: coupon,
         payment_method: "tap",
+        notes: notes,
       });
     else
       mutate({
@@ -139,6 +141,7 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
         delivery_notes: address?.delivery_notes,
         state: address?.state,
         coupon_code: coupon,
+        notes: notes,
       });
   }, [delivery_id, meal_plan_id, address, package_id, pricing_id, coupon]);
 
@@ -204,6 +207,7 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
             multiline
             style={styles.notes}
             textAlignVertical="top"
+            onChangeText={(e) => setnotes(e)}
           />
           <View style={[globalStyles.line2, styles.margin]}>
             <Text variant="poppins14black_regular" color="gray">
@@ -289,6 +293,7 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
                   delivery_notes: address?.delivery_notes,
                   state: address?.state,
                   coupon_code: coupon,
+                  notes: notes,
                 });
               }
             } else if (Platform.OS === "android") {

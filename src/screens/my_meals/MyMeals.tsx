@@ -1,45 +1,46 @@
-import DaySelector from '@/components/daySelector';
-import {Text} from '@/components/theme';
-import {useMyMeals} from '@/hooks/useMyMeals';
-import {globalStyles} from '@/styles/globalStyles';
-import React, {useState} from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
-import MealItem from './components/mealItem';
-import ItemSkeleton from '@/components/itemSkeleton';
-import {AppNavigationProps} from '@/navigators/navigation';
-import {useCurrentSubs} from '@/hooks/useCurrentSubs';
-import ChangeMealsModal from './components/changeMealsModal';
-import {useChangeMeal} from '@/hooks/useChangeMealSelection';
-import {showToast} from '@/components/toast';
-import {useTranslation} from 'react-i18next';
+import DaySelector from "@/components/daySelector";
+import { Text } from "@/components/theme";
+import { useMyMeals } from "@/hooks/useMyMeals";
+import { globalStyles } from "@/styles/globalStyles";
+import React, { useState } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
+import MealItem from "./components/mealItem";
+import ItemSkeleton from "@/components/itemSkeleton";
+import { AppNavigationProps } from "@/navigators/navigation";
+import { useCurrentSubs } from "@/hooks/useCurrentSubs";
+import ChangeMealsModal from "./components/changeMealsModal";
+import { useChangeMeal } from "@/hooks/useChangeMealSelection";
+import { showToast } from "@/components/toast";
+import { useTranslation } from "react-i18next";
+import RNBounceable from "@freakycoder/react-native-bounceable";
 
-const MyMeals = ({navigation}: AppNavigationProps<'MyMeals'>) => {
-  const {t, i18n} = useTranslation();
-  const [date, setdate] = useState('');
+const MyMeals = ({ navigation }: AppNavigationProps<"MyMeals">) => {
+  const { t, i18n } = useTranslation();
+  const [date, setdate] = useState("");
   const [visible, setvisible] = useState(false);
   const [type, settype] = useState<number>();
   const [selection, setselection] = useState<number>();
   const itemFullDate = new Date();
-  const formattedDate = itemFullDate.toISOString().split('T')[0];
+  const formattedDate = itemFullDate.toISOString().split("T")[0];
   const {
     data: weekMeals,
     isPending,
     refetch,
-  } = useMyMeals(date != '' ? date : formattedDate);
-  const {mutate, isPending: mealPending} = useChangeMeal({
+  } = useMyMeals(date != "" ? date : formattedDate);
+  const { mutate, isPending: mealPending } = useChangeMeal({
     onSuccess(data) {
-      showToast('successToast', data.message, 'top');
+      showToast("successToast", data.message, "top");
       setvisible(false);
       refetch();
     },
     onError(err: any) {
-      showToast('errorToast', err.errors[0].message, 'top');
+      showToast("errorToast", err.errors[0].message, "top");
     },
   });
 
-  const skeletonItems = Array.from({length: 3}, (_, index) => index);
+  const skeletonItems = Array.from({ length: 3 }, (_, index) => index);
   const handleItemClicked = React.useCallback((id: number) => {
-    navigation.navigate('Dish', {id});
+    navigation.navigate("Dish", { id });
     setvisible(false);
   }, []);
   const handleEditClicked = React.useCallback((id: number, type: number) => {
@@ -60,19 +61,19 @@ const MyMeals = ({navigation}: AppNavigationProps<'MyMeals'>) => {
   const handleModalItemClicked = React.useCallback(
     (id: number) => {
       if (selection != undefined && id != undefined) {
-        mutate({meal_id: id, selection_id: selectionRef.current!});
+        mutate({ meal_id: id, selection_id: selectionRef.current! });
       } else {
-        showToast('errorToast', 'Please select a meal', 'top');
+        showToast("errorToast", "Please select a meal", "top");
       }
     },
-    [selection], // Add meal to dependencies
+    [selection] // Add meal to dependencies
   );
 
   const handleOpenMealClicked = React.useCallback((id: number) => {
-    navigation.navigate('Dish', {id});
+    navigation.navigate("Dish", { id });
     setvisible(false);
   }, []);
-  const {data} = useCurrentSubs();
+  const { data } = useCurrentSubs();
 
   return (
     <View style={[globalStyles.container, styles.container]}>
@@ -80,18 +81,20 @@ const MyMeals = ({navigation}: AppNavigationProps<'MyMeals'>) => {
         textAlign="left"
         variant="poppins18black_semibold"
         me="s"
-        textTransform="capitalize">
-        {i18n.language == 'ar'
+        textTransform="capitalize"
+      >
+        {i18n.language == "ar"
           ? data?.dietSubscription.meal_plan.title_ar
           : data?.dietSubscription?.meal_plan.title}
       </Text>
-      <DaySelector onDateSelected={e => setdate(e)} />
+      <DaySelector onDateSelected={(e) => setdate(e)} />
       <View style={globalStyles.line}>
         <Text me="s" variant="poppins16black_medium">
-          {t('meals_today')}
+          {t("meals_today")}
         </Text>
       </View>
-      <View style={[{borderRadius: 12, marginTop: '5%'}]}>
+
+      <View style={styles.items}>
         {isPending ? (
           skeletonItems.map((_, index) => <ItemSkeleton key={index} />)
         ) : weekMeals?.meals && weekMeals.meals.length > 0 ? (
@@ -100,8 +103,8 @@ const MyMeals = ({navigation}: AppNavigationProps<'MyMeals'>) => {
               data={weekMeals?.meals}
               contentContainerStyle={styles.list}
               showsVerticalScrollIndicator={false}
-              keyExtractor={item => item.selection_id.toString()}
-              renderItem={({item}) => (
+              keyExtractor={(item) => item.selection_id.toString()}
+              renderItem={({ item }) => (
                 <MealItem
                   item={item}
                   onItemClicked={handleItemClicked}
@@ -112,7 +115,7 @@ const MyMeals = ({navigation}: AppNavigationProps<'MyMeals'>) => {
           </View>
         ) : (
           <Text variant="poppins16black_medium" textAlign="center">
-            {t('no_meals')}
+            {t("no_meals")}
           </Text>
         )}
       </View>
@@ -121,7 +124,7 @@ const MyMeals = ({navigation}: AppNavigationProps<'MyMeals'>) => {
         onBackToMealsClicked={handleBackSelected}
         onModalItemClicked={handleModalItemClicked}
         onOpenMealClicked={handleOpenMealClicked}
-        day={date != '' ? date : formattedDate}
+        day={date != "" ? date : formattedDate}
         type={type}
         isLoading={mealPending}
       />
@@ -131,11 +134,12 @@ const MyMeals = ({navigation}: AppNavigationProps<'MyMeals'>) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: '5%',
+    padding: "5%",
   },
   list: {
     paddingBottom: 150,
   },
+  items: { borderRadius: 12, marginTop: "5%" },
 });
 
 export default MyMeals;

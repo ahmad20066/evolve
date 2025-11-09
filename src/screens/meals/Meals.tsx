@@ -82,6 +82,7 @@ const Meals = ({ navigation }: AppNavigationProps<"Meals">) => {
       <View style={styles.btn}>
         <BaseButton
           label={t("next")}
+<<<<<<< HEAD
           onPress={() => {
             const selectedMealPlan = data?.find((item) => item.id === active);
             if (!selectedMealPlan) {
@@ -92,6 +93,29 @@ const Meals = ({ navigation }: AppNavigationProps<"Meals">) => {
               id: active,
             });
           }}
+=======
+          onPress={() =>
+            navigation.navigate("PackageDetails", {
+              pay_details: {
+                title:
+                  i18n.language === "ar"
+                    ? data?.find((item) => item.id === active)?.title_ar!
+                    : data?.find((item) => item.id === active)?.title || "",
+                price:
+                  data?.find((item) => item.id === active)?.price_monthly || 0,
+                number_of_days:
+                  data?.find((item) => item.id === active)?.number_of_days || 0,
+                description:
+                  i18n.language === "ar"
+                    ? data?.find((item) => item.id === active)?.description_ar!
+                    : data?.find((item) => item.id === active)?.description ||
+                      "",
+                image: data?.find((item) => item.id === active)?.image || "",
+                meal_plan_id: active,
+              },
+            })
+          }
+>>>>>>> 3bf8217b3a459dbf244f6553c144f2101a31f386
         />
       </View>
     </>

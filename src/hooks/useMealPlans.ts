@@ -14,6 +14,8 @@ export type IMealPlans = {
   createdAt: string;
   updatedAt: string;
   number_of_days: number;
+  description: string;
+  description_ar: string;
   types: {
     id: number;
     title: string;

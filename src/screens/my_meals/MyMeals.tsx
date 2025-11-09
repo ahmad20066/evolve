@@ -27,6 +27,9 @@ const MyMeals = ({ navigation }: AppNavigationProps<"MyMeals">) => {
     isPending,
     refetch,
   } = useMyMeals(date != "" ? date : formattedDate);
+
+  console.log({ weekMeals });
+
   const { mutate, isPending: mealPending } = useChangeMeal({
     onSuccess(data) {
       showToast("successToast", data.message, "top");

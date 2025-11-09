@@ -47,6 +47,7 @@ import OrderDetail from "@/screens/order_detail";
 import Chat from "@/screens/chat";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Checkout from "@/screens/checkout";
+import PackageDetails from "@/screens/package_details";
 
 const Stack = createStackNavigator<AppRoutes>();
 const LoginScreens = [
@@ -87,6 +88,7 @@ const Screens = [
   { OrderDetail },
   { Chat },
   { Checkout },
+  { PackageDetails },
 ];
 
 type TScreens = keyof (typeof Screens)[0];

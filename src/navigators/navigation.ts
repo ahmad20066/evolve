@@ -102,4 +102,14 @@ export type AppRoutes = {
   Checkout: {
     url: string;
   };
+  PackageDetails: {
+    pay_details: {
+      title: string;
+      price: number;
+      number_of_days: number;
+      description: string;
+      image: string;
+      meal_plan_id: number;
+    };
+  };
 };

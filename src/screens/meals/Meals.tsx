@@ -83,8 +83,7 @@ const Meals = ({ navigation }: AppNavigationProps<"Meals">) => {
         <BaseButton
           label={t("next")}
           onPress={() =>
-            navigation.navigate("DeliveryTime", {
-              meal_plan_id: active,
+            navigation.navigate("PackageDetails", {
               pay_details: {
                 title:
                   i18n.language === "ar"
@@ -94,6 +93,13 @@ const Meals = ({ navigation }: AppNavigationProps<"Meals">) => {
                   data?.find((item) => item.id === active)?.price_monthly || 0,
                 number_of_days:
                   data?.find((item) => item.id === active)?.number_of_days || 0,
+                description:
+                  i18n.language === "ar"
+                    ? data?.find((item) => item.id === active)?.description_ar!
+                    : data?.find((item) => item.id === active)?.description ||
+                      "",
+                image: data?.find((item) => item.id === active)?.image || "",
+                meal_plan_id: active,
               },
             })
           }

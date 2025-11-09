@@ -38,6 +38,7 @@ const SignupSchema = Yup.object().shape({
     .trim()
     // .min(8, 'Password must be at least 8 characters')
     .required("Password is required"),
+
   // .matches(
   //   /[!@#$%^&*(),.?":{}|<>0-9]/,
   //   'Password must contain at least 1 special character',
@@ -45,13 +46,14 @@ const SignupSchema = Yup.object().shape({
   // .matches(/[0-9]/, 'Password must contain at least 1 number')
   // .matches(/[A-Z]/, 'Password must contain at least 1 uppercase letter')
   // .matches(/[a-z]/, 'Password must contain at least 1 lowercase letter'),
+  agreeToTerms: Yup.boolean()
+    .oneOf([true], "You must agree to the terms and conditions")
+    .required("You must agree to the terms and conditions"),
 });
 
 const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
   const { t } = useTranslation();
   const [pass, setpass] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
   const { fcm_token } = useAppSelector((state) => state.local);
 
   const { mutate } = useSignup({
@@ -74,6 +76,8 @@ const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
     touched,
     isSubmitting,
     setSubmitting,
+    setFieldValue,
+    setFieldTouched,
   } = useFormik({
     validationSchema: SignupSchema,
     initialValues: {
@@ -81,6 +85,7 @@ const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
       phone_number: "",
       email: "",
       password: "",
+      agreeToTerms: false,
     },
     onSubmit: (value) => {
       const payload: any = {
@@ -96,6 +101,11 @@ const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
       mutate(payload);
     },
   });
+  const toggleSwitch = () => {
+    const newValue = !values.agreeToTerms;
+    setFieldValue("agreeToTerms", newValue);
+    setFieldTouched("agreeToTerms", true);
+  };
   return (
     <View style={globalStyles.container}>
       <View style={styles.container}>
@@ -168,13 +178,23 @@ const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
             thumbColor={theme.colors.white}
             ios_backgroundColor={theme.colors.input}
             onValueChange={toggleSwitch}
-            value={isEnabled}
+            value={values.agreeToTerms}
             style={styles.switch}
           />
           <Text variant="poppins12black_regular" color="gray">
             {t("agree")}
           </Text>
         </View>
+        {errors.agreeToTerms && touched.agreeToTerms && (
+          <Text
+            variant="poppins12black_regular"
+            color="red"
+            mt="xs"
+            textAlign="left"
+          >
+            {errors.agreeToTerms}
+          </Text>
+        )}
 
         <BaseButton
           label={t("signup")}

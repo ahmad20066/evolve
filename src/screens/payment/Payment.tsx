@@ -254,7 +254,11 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
             <Text variant="poppins14black_regular" color="gray">
               {t("tax")}
             </Text>
-            <Text variant="poppins14black_regular">1.99</Text>
+            <Text variant="poppins14black_regular">
+              {discount 
+                ? ((newPrice || 0) * 0.15).toFixed(2)
+                : ((pay_details?.price || 0) * 0.15).toFixed(2)}
+            </Text>
           </View>
           <View style={styles.line} />
           <View style={globalStyles.line2}>
@@ -262,7 +266,9 @@ const Payment = ({ navigation, route }: AppNavigationProps<"Payment">) => {
               {t("total")}
             </Text>
             <Text variant="poppins14black_regular">
-              {discount ? newPrice : (pay_details?.price || 0) + 1.99}
+              {discount 
+                ? ((newPrice || 0) * 1.15).toFixed(2)
+                : ((pay_details?.price || 0) * 1.15).toFixed(2)}
             </Text>
           </View>
 

@@ -69,8 +69,17 @@ const WorkoutPlan = ({ navigation }: AppNavigationProps<"WorkoutPlan">) => {
       }
       setActive(Number(item.id));
       setItem(enriched || item); // Android = original, iOS = enriched
+      
+      // Navigate directly to package details
+      if (!item.pricings) {
+        showToast("errorToast", "Please select a plan", "top");
+        return;
+      }
+      navigation.navigate("PackageDetails", {
+        id: Number(item.id),
+      });
     },
-    [enhancedData]
+    [enhancedData, navigation]
   );
 
   // ...existing code...
@@ -298,8 +307,8 @@ const WorkoutPlan = ({ navigation }: AppNavigationProps<"WorkoutPlan">) => {
 
   return (
     <View style={globalStyles.container}>
-      <View style={styles.container}>
-        <View style={[globalStyles.line2, styles.margin]}>
+      <View style={styles.header}>
+        <View style={[globalStyles.line2, styles.headerContent]}>
           <Text variant="poppins18black_semibold">{t("choose_fitness")}</Text>
           <RNBounceable
             style={globalStyles.line}
@@ -312,63 +321,61 @@ const WorkoutPlan = ({ navigation }: AppNavigationProps<"WorkoutPlan">) => {
           </RNBounceable>
         </View>
       </View>
-      <View>
-        <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-          {isPending ? (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {isPending ? (
+          <View style={styles.skeletonContainer}>
             <PackageSkeleton />
-          ) : (
-            enhancedData?.map((item, index) => (
-              <WorkoutSelector
-                key={item.id}
-                item={item}
-                active={active}
-                setActive={setActive}
-                onItemSelected={handleItemClicked}
-                islast={index === enhancedData.length - 1}
-              />
-            ))
-          )}
-        </ScrollView>
-      </View>
-      <View style={styles.container}>
-        {Platform.OS === "ios" && (
-          <RNBounceable onPress={handleRestorePurchases}>
-            <Text variant="poppins14black_regular" color="apptheme">
-              {t("restore_purchases", "Restore Purchases")}
-            </Text>
-          </RNBounceable>
+            <PackageSkeleton />
+            <PackageSkeleton />
+          </View>
+        ) : (
+          enhancedData?.map((item) => (
+            <WorkoutSelector
+              key={item.id}
+              item={item}
+              active={active}
+              setActive={setActive}
+              onItemSelected={handleItemClicked}
+            />
+          ))
         )}
-        <BaseButton
-          label={t("next")}
-          isLoading={subPending || isRevenueCatLoading}
-          disabled={
-            !item ||
-            (Platform.OS === "ios" && !item.rcPackage) ||
-            subPending ||
-            isRevenueCatLoading
-          }
-          onPress={() => {
-            if (!item || !item.pricings) {
-              showToast("errorToast", "Please select a plan", "top");
-              return;
-            }
-
-            // Navigate to package details page for both iOS and Android
-            navigation.navigate("PackageDetails", {
-              id: Number(item.id),
-            });
-          }}
-        />
-      </View>
+        {Platform.OS === "ios" && (
+          <View style={styles.restoreContainer}>
+            <RNBounceable onPress={handleRestorePurchases}>
+              <Text variant="poppins14black_regular" color="apptheme">
+                {t("restore_purchases", "Restore Purchases")}
+              </Text>
+            </RNBounceable>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  header: {
     paddingHorizontal: "5%",
+    paddingTop: "5%",
+    paddingBottom: "3%",
   },
-  margin: { marginTop: "5%" },
+  headerContent: {
+    marginTop: "2%",
+  },
+  scrollContent: {
+    paddingHorizontal: "5%",
+    paddingBottom: "5%",
+  },
+  skeletonContainer: {
+    gap: 16,
+  },
+  restoreContainer: {
+    alignItems: "center",
+    paddingVertical: 20,
+  },
 });
 
 export default WorkoutPlan;

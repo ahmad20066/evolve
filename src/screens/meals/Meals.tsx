@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import Right from "@/assets/svg/smallright.svg";
 import RNBounceable from "@freakycoder/react-native-bounceable";
-import BaseButton from "@/components/baseBtn";
 import PackageSelector from "@/components/packageSelector";
 import { AppNavigationProps } from "@/navigators/navigation";
 import PackageSkeleton from "@/components/packageSkeleton";
@@ -73,51 +72,17 @@ const Meals = ({ navigation }: AppNavigationProps<"Meals">) => {
                   item={item}
                   active={active}
                   setActive={setActive}
+                  onPress={() => {
+                    navigation.navigate("MealPlanDetails", {
+                      id: item.id,
+                    });
+                  }}
                 />
               ))
             )}
           </View>
         </View>
       </ScrollView>
-      <View style={styles.btn}>
-        <BaseButton
-          label={t("next")}
-<<<<<<< HEAD
-          onPress={() => {
-            const selectedMealPlan = data?.find((item) => item.id === active);
-            if (!selectedMealPlan) {
-              return;
-            }
-            // Navigate to meal plan details page
-            navigation.navigate("MealPlanDetails", {
-              id: active,
-            });
-          }}
-=======
-          onPress={() =>
-            navigation.navigate("PackageDetails", {
-              pay_details: {
-                title:
-                  i18n.language === "ar"
-                    ? data?.find((item) => item.id === active)?.title_ar!
-                    : data?.find((item) => item.id === active)?.title || "",
-                price:
-                  data?.find((item) => item.id === active)?.price_monthly || 0,
-                number_of_days:
-                  data?.find((item) => item.id === active)?.number_of_days || 0,
-                description:
-                  i18n.language === "ar"
-                    ? data?.find((item) => item.id === active)?.description_ar!
-                    : data?.find((item) => item.id === active)?.description ||
-                      "",
-                image: data?.find((item) => item.id === active)?.image || "",
-                meal_plan_id: active,
-              },
-            })
-          }
->>>>>>> 3bf8217b3a459dbf244f6553c144f2101a31f386
-        />
-      </View>
     </>
   );
 };
@@ -126,7 +91,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: "5%",
   },
-  btn: { paddingHorizontal: "5%" },
   margin: { marginTop: "5%" },
   filters: {
     height: 30,

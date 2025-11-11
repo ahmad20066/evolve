@@ -1,6 +1,9 @@
+const path = require('path');
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
-const defaultConfig = getDefaultConfig(__dirname);
+// Resolve project root - handle junction paths
+const projectRoot = path.resolve(__dirname);
+const defaultConfig = getDefaultConfig(projectRoot);
 const {assetExts, sourceExts} = defaultConfig.resolver;
 
 /**
@@ -10,6 +13,8 @@ const {assetExts, sourceExts} = defaultConfig.resolver;
  * @type {import('metro-config').MetroConfig}
  */
 const config = {
+  projectRoot: projectRoot,
+  watchFolders: [projectRoot],
   transformer: {
     babelTransformerPath: require.resolve('react-native-svg-transformer'),
   },

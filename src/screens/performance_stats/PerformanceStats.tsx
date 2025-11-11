@@ -184,7 +184,117 @@ const PerformanceStats = ({
     refetch();
   };
 
+  // Check if error is 403 "No subscription for this user"
+  const checkSubscriptionError = (err: any): boolean => {
+    if (!err) return false;
+    
+    // First, check the original axios error structure (might be preserved)
+    if (err?.response) {
+      const responseData = err.response.data;
+      const status = err.response.status;
+      
+      // Check for 403 status
+      if (status === 403) {
+        // Check if data contains subscription message
+        if (responseData) {
+          const dataStr = JSON.stringify(responseData).toLowerCase();
+          if (dataStr.includes("no subscription") || 
+              dataStr.includes("subscription") || 
+              dataStr.includes("subscribe")) {
+            return true;
+          }
+          
+          // Check message field directly
+          if (responseData?.message && 
+              typeof responseData.message === "string" &&
+              responseData.message.toLowerCase().includes("no subscription")) {
+            return true;
+          }
+        }
+      }
+    }
+    
+    // Check errors array (from axios interceptor) - this is the primary format
+    if (Array.isArray(err?.errors)) {
+      const hasSubscriptionMessage = err.errors.some((errorMsg: any) => {
+        // Handle string messages
+        if (typeof errorMsg === "string") {
+          return errorMsg.toLowerCase().includes("no subscription");
+        }
+        // Handle object messages (e.g., {message: 'No subscription for this user'})
+        if (errorMsg && typeof errorMsg === "object") {
+          const msg = errorMsg?.message || errorMsg?.detail || JSON.stringify(errorMsg);
+          return typeof msg === "string" && msg.toLowerCase().includes("no subscription");
+        }
+        return false;
+      });
+      if (hasSubscriptionMessage) return true;
+    }
+    
+    // Check error message in various formats
+    const message = 
+      err?.response?.data?.message ||
+      err?.response?.data?.data?.message ||
+      err?.message ||
+      (typeof err?.errors === "string" ? err.errors : null);
+    
+    if (message) {
+      const messageStr = typeof message === "string" 
+        ? message.toLowerCase() 
+        : JSON.stringify(message).toLowerCase();
+      if (messageStr.includes("no subscription")) return true;
+    }
+    
+    return false;
+  };
+
+  const isSubscriptionError = checkSubscriptionError(error);
+
   if (error) {
+    // Show subscription required message
+    if (isSubscriptionError) {
+      return (
+        <View style={[globalStyles.container, styles.container]}>
+          <View style={globalStyles.line2}>
+            <RoundButton onPress={() => navigation.goBack()}>
+              <Back color={theme.colors.black} />
+            </RoundButton>
+            <Text variant="poppins18black_semibold" me="s">
+              {t("performance_stats")}
+            </Text>
+            <View />
+          </View>
+          <View style={styles.subscriptionErrorContainer}>
+            <Chart width={64} height={64} color={theme.colors.apptheme} />
+            <Text 
+              variant="poppins18black_bold" 
+              color="black" 
+              textAlign="center"
+              mt="m"
+              fontSize={22}
+            >
+              {t("subscription_required")}
+            </Text>
+            <Text 
+              variant="poppins14black_regular" 
+              color="gray" 
+              textAlign="center"
+              mt="s"
+              style={styles.subscriptionMessage}
+            >
+              {t("subscribe_to_view_stats")}
+            </Text>
+            <BaseButton
+              label={t("subscribe_now")}
+              onPress={() => navigation.navigate("WorkoutPlan")}
+              mt={24}
+            />
+          </View>
+        </View>
+      );
+    }
+
+    // Show generic error
     return (
       <View style={[globalStyles.container, styles.container]}>
         <View style={globalStyles.line2}>
@@ -203,7 +313,7 @@ const PerformanceStats = ({
           <BaseButton
             label={t("retry")}
             onPress={handleRefresh}
-            mt="m"
+            mt={16}
           />
         </View>
       </View>
@@ -476,6 +586,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: "10%",
+  },
+  subscriptionErrorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "10%",
+  },
+  subscriptionMessage: {
+    lineHeight: 22,
+    paddingHorizontal: "5%",
   },
   section: {
     marginBottom: "6%",

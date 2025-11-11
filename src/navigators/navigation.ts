@@ -117,23 +117,11 @@ export type AppRoutes = {
   Checkout: {
     url: string;
   };
-<<<<<<< HEAD
   PerformanceStats: undefined;
   PackageDetails: {
     id: number;
   };
   MealPlanDetails: {
     id: number;
-=======
-  PackageDetails: {
-    pay_details: {
-      title: string;
-      price: number;
-      number_of_days: number;
-      description: string;
-      image: string;
-      meal_plan_id: number;
-    };
->>>>>>> 3bf8217b3a459dbf244f6553c144f2101a31f386
   };
 };

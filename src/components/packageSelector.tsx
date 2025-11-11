@@ -13,9 +13,10 @@ interface packaegProps {
   item: IMealPlans;
   active: number;
   setActive: (active: number) => void;
+  onPress?: () => void;
 }
 
-const PackageSelector = ({ item, active, setActive }: packaegProps) => {
+const PackageSelector = ({ item, active, setActive, onPress }: packaegProps) => {
   const isActive = active === item.id;
   const { i18n } = useTranslation();
 
@@ -30,6 +31,9 @@ const PackageSelector = ({ item, active, setActive }: packaegProps) => {
       ]}
       onPress={() => {
         setActive(item.id);
+        if (onPress) {
+          onPress();
+        }
       }}
     >
       {typeof item.image === "string" ? (

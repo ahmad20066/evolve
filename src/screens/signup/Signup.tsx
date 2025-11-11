@@ -46,15 +46,9 @@ const SignupSchema = Yup.object().shape({
   // .matches(/[0-9]/, 'Password must contain at least 1 number')
   // .matches(/[A-Z]/, 'Password must contain at least 1 uppercase letter')
   // .matches(/[a-z]/, 'Password must contain at least 1 lowercase letter'),
-<<<<<<< HEAD
   termsAccepted: Yup.boolean()
     .required("You must accept the terms and conditions")
     .oneOf([true], "You must accept the terms and conditions"),
-=======
-  agreeToTerms: Yup.boolean()
-    .oneOf([true], "You must agree to the terms and conditions")
-    .required("You must agree to the terms and conditions"),
->>>>>>> 3bf8217b3a459dbf244f6553c144f2101a31f386
 });
 
 const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
@@ -91,11 +85,7 @@ const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
       phone_number: "",
       email: "",
       password: "",
-<<<<<<< HEAD
       termsAccepted: false,
-=======
-      agreeToTerms: false,
->>>>>>> 3bf8217b3a459dbf244f6553c144f2101a31f386
     },
     onSubmit: (value) => {
       if (!value.termsAccepted) {
@@ -192,33 +182,17 @@ const Signup = ({ navigation }: AppNavigationProps<"Signup">) => {
             }}
             thumbColor={theme.colors.white}
             ios_backgroundColor={theme.colors.input}
-<<<<<<< HEAD
             onValueChange={(value) => setFieldValue("termsAccepted", value)}
             value={values.termsAccepted}
-=======
-            onValueChange={toggleSwitch}
-            value={values.agreeToTerms}
->>>>>>> 3bf8217b3a459dbf244f6553c144f2101a31f386
             style={styles.switch}
           />
           <Text variant="poppins12black_regular" color="gray">
             {t("agree")}
           </Text>
         </View>
-<<<<<<< HEAD
         {errors.termsAccepted && touched.termsAccepted && (
           <Text variant="poppins12black_regular" color="red" ms="s">
             {errors.termsAccepted}
-=======
-        {errors.agreeToTerms && touched.agreeToTerms && (
-          <Text
-            variant="poppins12black_regular"
-            color="red"
-            mt="xs"
-            textAlign="left"
-          >
-            {errors.agreeToTerms}
->>>>>>> 3bf8217b3a459dbf244f6553c144f2101a31f386
           </Text>
         )}
 

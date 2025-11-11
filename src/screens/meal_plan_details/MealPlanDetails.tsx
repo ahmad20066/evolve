@@ -92,18 +92,46 @@ const MealPlanDetails = ({
       return;
     }
 
-    navigation.navigate("DurationSelection", {
-      meal_plan_id: id,
-      meal_plan: {
-        id: selectedMealPlan.id,
-        title: selectedMealPlan.title,
-        title_ar: selectedMealPlan.title_ar,
-        price_monthly: selectedMealPlan.price_monthly,
-        price_21_days: selectedMealPlan.price_21_days,
-        price_26_days: selectedMealPlan.price_26_days,
-        number_of_days: selectedMealPlan.number_of_days,
-      },
-    });
+    // If 21 or 26 days is selected, skip DurationSelection and go directly to DeliveryTime
+    if (duration === "21" || duration === "26") {
+      const selectedPrice =
+        duration === "21"
+          ? selectedMealPlan.price_21_days
+          : selectedMealPlan.price_26_days;
+      const selectedDays = duration === "21" ? 21 : 26;
+
+      if (!selectedPrice) {
+        showToast("errorToast", "Pricing not available", "top");
+        return;
+      }
+
+      navigation.navigate("DeliveryTime", {
+        meal_plan_id: id,
+        subscription_duration: selectedDays,
+        pay_details: {
+          title:
+            i18n.language === "ar"
+              ? selectedMealPlan.title_ar
+              : selectedMealPlan.title || "",
+          price: selectedPrice,
+          number_of_days: selectedDays,
+        },
+      });
+    } else {
+      // For monthly, show DurationSelection to let user choose
+      navigation.navigate("DurationSelection", {
+        meal_plan_id: id,
+        meal_plan: {
+          id: selectedMealPlan.id,
+          title: selectedMealPlan.title,
+          title_ar: selectedMealPlan.title_ar,
+          price_monthly: selectedMealPlan.price_monthly,
+          price_21_days: selectedMealPlan.price_21_days,
+          price_26_days: selectedMealPlan.price_26_days,
+          number_of_days: selectedMealPlan.number_of_days,
+        },
+      });
+    }
   };
 
   const formatPrice = (price: number) => {

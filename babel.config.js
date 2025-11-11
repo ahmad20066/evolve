@@ -1,3 +1,5 @@
+const path = require('path');
+
 const presets = ["@react-native/babel-preset"];
 const plugins = [];
 
@@ -5,10 +7,10 @@ plugins.push(
   [
     "module-resolver",
     {
-      root: ["./src"],
-      extensions: [".js", ".json"],
+      root: [path.resolve(__dirname, "src")],
+      extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
       alias: {
-        "@": "./src",
+        "@": path.resolve(__dirname, "src"),
       },
     },
   ],

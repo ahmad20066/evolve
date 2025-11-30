@@ -4,7 +4,14 @@ import { Text, theme } from "@/components/theme";
 import { globalStyles } from "@/styles/globalStyles";
 import RNBounceable from "@freakycoder/react-native-bounceable";
 import React, { useState } from "react";
-import { Platform, StyleSheet, TextInput, View } from "react-native";
+import {
+  Keyboard,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import Back from "@/assets/svg/arrow-left.svg";
 import { AppNavigationProps } from "@/navigators/navigation";
 import { useTranslation } from "react-i18next";
@@ -35,98 +42,109 @@ const Height = ({ navigation, route }: AppNavigationProps<"Height">) => {
     setValue((prevValue) => (prevValue > 0 ? prevValue - 5 : 0)); // Prevent negative values
   };
   return (
-    <View style={[globalStyles.container, styles.container]}>
-      <View>
-        <RoundButton onPress={() => navigation.goBack()}>
-          <Back color={theme.colors.black} />
-        </RoundButton>
-        <Text mt="xl" mb="s" variant="poppins16black_medium" textAlign="center">
-          4
-          <Text variant="poppins16black_regular" color="gray">
-            /6
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={[globalStyles.container, styles.container]}>
+        <View>
+          <RoundButton onPress={() => navigation.goBack()}>
+            <Back color={theme.colors.black} />
+          </RoundButton>
+          <Text
+            mt="xl"
+            mb="s"
+            variant="poppins16black_medium"
+            textAlign="center"
+          >
+            4
+            <Text variant="poppins16black_regular" color="gray">
+              /6
+            </Text>
           </Text>
-        </Text>
-        <Text mb="s" textAlign="center" variant="unbounded20black_medium">
-          {t("whats_your")}{" "}
-          <Text variant="unbounded20black_medium" color="apptheme">
-            {t("height")}?
+          <Text mb="s" textAlign="center" variant="unbounded20black_medium">
+            {t("whats_your")}{" "}
+            <Text variant="unbounded20black_medium" color="apptheme">
+              {t("height")}?
+            </Text>
           </Text>
-        </Text>
-        <Text textAlign="center" variant="poppins14black_regular" color="gray">
-          {t("weight_description")}
-        </Text>
-        <View style={[globalStyles.line, styles.heightype]}>
-          {height.map((item) => (
-            <RNBounceable
-              key={item.key}
-              onPress={() => setactive(item.key)}
-              style={[
-                styles.btn,
-                {
-                  backgroundColor:
-                    active == item.key
-                      ? theme.colors.lightGreen
-                      : theme.colors.screen,
-                },
-              ]}
-            >
-              <Text
-                variant="poppins14black_regular"
-                color={active == item.key ? "black" : "gray"}
+          <Text
+            textAlign="center"
+            variant="poppins14black_regular"
+            color="gray"
+          >
+            {t("weight_description")}
+          </Text>
+          <View style={[globalStyles.line, styles.heightype]}>
+            {height.map((item) => (
+              <RNBounceable
+                key={item.key}
+                onPress={() => setactive(item.key)}
+                style={[
+                  styles.btn,
+                  {
+                    backgroundColor:
+                      active == item.key
+                        ? theme.colors.lightGreen
+                        : theme.colors.screen,
+                  },
+                ]}
               >
-                {item.height}
+                <Text
+                  variant="poppins14black_regular"
+                  color={active == item.key ? "black" : "gray"}
+                >
+                  {item.height}
+                </Text>
+              </RNBounceable>
+            ))}
+          </View>
+          <View style={[styles.plusminus, globalStyles.line2]}>
+            <RNBounceable style={styles.smallcircles} onPress={decreaseValue}>
+              <Text
+                variant="poppinsTitle20black_regular"
+                lineHeight={30}
+                fontSize={21}
+                color="white"
+              >
+                -
               </Text>
             </RNBounceable>
-          ))}
-        </View>
-        <View style={[styles.plusminus, globalStyles.line2]}>
-          <RNBounceable style={styles.smallcircles} onPress={decreaseValue}>
-            <Text
-              variant="poppinsTitle20black_regular"
-              lineHeight={30}
-              fontSize={21}
-              color="white"
-            >
-              -
-            </Text>
-          </RNBounceable>
-          <View style={globalStyles.line}>
-            <TextInput
-              style={styles.input}
-              value={value.toString()}
-              onChangeText={handleInputChange}
-              keyboardType="numeric"
-              textAlign="center"
-              returnKeyType="done"
-            />
-            <Text variant="poppins12black_bold" color="apptheme">
-              {active == 1 ? t("cm") : t("ft")}
-            </Text>
+            <View style={globalStyles.line}>
+              <TextInput
+                style={styles.input}
+                value={value.toString()}
+                onChangeText={handleInputChange}
+                keyboardType="numeric"
+                textAlign="center"
+                returnKeyType="done"
+              />
+              <Text variant="poppins12black_bold" color="apptheme">
+                {active == 1 ? t("cm") : t("ft")}
+              </Text>
+            </View>
+            <RNBounceable style={styles.smallcircles} onPress={increaseValue}>
+              <Text
+                lineHeight={30}
+                fontSize={21}
+                variant="poppinsTitle20black_regular"
+                color="white"
+              >
+                +
+              </Text>
+            </RNBounceable>
           </View>
-          <RNBounceable style={styles.smallcircles} onPress={increaseValue}>
-            <Text
-              lineHeight={30}
-              fontSize={21}
-              variant="poppinsTitle20black_regular"
-              color="white"
-            >
-              +
-            </Text>
-          </RNBounceable>
         </View>
+        <BaseButton
+          label={t("continue")}
+          onPress={() =>
+            navigation.navigate("Sport", {
+              weight,
+              gender,
+              age,
+              height: value.toString(),
+            })
+          }
+        />
       </View>
-      <BaseButton
-        label={t("continue")}
-        onPress={() =>
-          navigation.navigate("Sport", {
-            weight,
-            gender,
-            age,
-            height: value.toString(),
-          })
-        }
-      />
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

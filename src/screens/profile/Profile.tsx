@@ -41,6 +41,7 @@ const Profile = ({ navigation }: AppNavigationProps<"Profile">) => {
   const [personalVisible, setpersonalVisible] = useState(false);
   const logoutreff = useRef<any>(null);
   const { language } = useAppSelector((state) => state.local);
+  const { data: profile } = useGetProfile();
 
   const handleBackToProfileClicked = React.useCallback(() => {
     setModalVisible(false);
@@ -85,10 +86,7 @@ const Profile = ({ navigation }: AppNavigationProps<"Profile">) => {
   return (
     <ScrollView style={[globalStyles.container, styles.container]}>
       <View style={[globalStyles.line, { marginLeft: "5%" }]}>
-        <Image
-          source={require("@/assets/images/male.png")}
-          style={styles.user}
-        />
+        <Image source={{ uri: profile?.profile_image }} style={styles.user} />
         <View>
           <Text
             textAlign="left"

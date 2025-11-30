@@ -45,6 +45,8 @@
 	<string>Allow Evolve to have access to photos </string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>AutoCentR would like to access your photo library to allow you to upload a profile picture. This helps personalize your account and makes it easier for others to recognize you.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Poppins-Bold.ttf</string>

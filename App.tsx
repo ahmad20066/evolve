@@ -17,7 +17,7 @@ if (__DEV__) {
     // Add specific warnings to ignore here if needed
     // "Warning: ...",
   ]);
-  // LogBox.ignoreAllLogs(); // Commented out to see errors
+  LogBox.ignoreAllLogs();
 }
 
 function App() {

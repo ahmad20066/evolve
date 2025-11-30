@@ -1,6 +1,6 @@
-import {axios, IApiError} from '@/hooks/axios.config';
-import {useAppSelector} from '@/store';
-import {useQuery, UseQueryOptions} from '@tanstack/react-query';
+import { axios, IApiError } from "@/hooks/axios.config";
+import { useAppSelector } from "@/store";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 export type IGetProfile = {
   id: number;
@@ -23,6 +23,7 @@ export type IGetProfile = {
   updatedAt: string;
   weight: number;
   dob: string;
+  profile_image: string;
 };
 
 async function getProfile(token?: string) {
@@ -36,14 +37,11 @@ async function getProfile(token?: string) {
 }
 
 export const useGetProfile = (
-  config?: Omit<
-    UseQueryOptions<IGetProfile, IApiError>,
-    'queryKey' | 'queryFn'
-  >,
+  config?: Omit<UseQueryOptions<IGetProfile, IApiError>, "queryKey" | "queryFn">
 ) => {
-  const {access_token} = useAppSelector(state => state.local);
+  const { access_token } = useAppSelector((state) => state.local);
   return useQuery({
-    queryKey: ['GetProfile'],
+    queryKey: ["GetProfile"],
     queryFn: () => getProfile(access_token),
     retry: 2,
     ...config,

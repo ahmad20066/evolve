@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Back from "@/assets/svg/arrow-left.svg";
 import { globalStyles } from "@/styles/globalStyles";
@@ -12,6 +12,7 @@ import { showToast } from "@/components/toast";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { setTempToken } from "@/store/slices/local";
+import { useSendOtp } from "@/hooks/useSendOtp";
 
 const VerificationOtp = ({
   navigation,
@@ -19,6 +20,7 @@ const VerificationOtp = ({
 }: AppNavigationProps<"VerificationOtp">) => {
   const { t } = useTranslation();
   const [code, setcode] = useState("");
+  const [timer, setTimer] = useState(20);
   const { email, method, forget } = route.params;
   const dispatch = useDispatch();
   const { mutate, isPending } = useVerify({
@@ -31,6 +33,37 @@ const VerificationOtp = ({
       showToast("errorToast", error.errors[0].error, "top");
     },
   });
+
+  const { mutate: sendOtp, isPending: isSendingOtp } = useSendOtp({
+    onSuccess(data) {
+      showToast("successToast", data.message, "top");
+    },
+    onError(error: any) {
+      showToast("errorToast", error.errors[0].message, "top");
+    },
+  });
+
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleResend = () => {
+    // TODO: Add resend OTP API call here
+    setTimer(20);
+    sendOtp({ email: email!, method: method! });
+  };
+
   return (
     <View style={[globalStyles.container, styles.container]}>
       <RoundButton onPress={() => navigation.goBack()}>
@@ -79,13 +112,25 @@ const VerificationOtp = ({
       />
       <Text textAlign="center" variant="poppins12black_regular" color="gray">
         {t("resend_code_in")}{" "}
-        <Text
-          textAlign="center"
-          variant="poppins12black_regular"
-          color="apptheme"
-        >
-          0:20
-        </Text>
+        {timer > 0 ? (
+          <Text
+            textAlign="center"
+            variant="poppins12black_regular"
+            color="apptheme"
+          >
+            {formatTime(timer)}
+          </Text>
+        ) : (
+          <Text
+            textAlign="center"
+            variant="poppins12black_regular"
+            color="apptheme"
+            onPress={handleResend}
+            style={{ textDecorationLine: "underline" }}
+          >
+            {t("resend_now")}
+          </Text>
+        )}
       </Text>
     </View>
   );
